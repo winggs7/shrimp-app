@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+var cors = require("cors");
 
 const connection = require('./config/dbconnection');
 const pondRouter = require('./routers/pond');
@@ -11,6 +12,8 @@ app.use(express.urlencoded({
     extended: true
 }));
 
+app.use(cors());
+
 connection.connect((err) => {
     if (err) throw err
     console.log("DB connected!")
@@ -20,6 +23,6 @@ app.use('/pond', pondRouter);
 app.use('/crop', cropRouter);
 app.use('/stat', statRouter);
 
-app.listen(3000, () => {
+app.listen(7000, () => {
     console.log("Backend already!")
 })

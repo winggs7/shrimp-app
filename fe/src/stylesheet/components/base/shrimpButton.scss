@@ -1,0 +1,37 @@
+.shrimp-button {
+    border: solid 1px #256D85;
+    border-radius: 4px;
+    padding: 10px 30px;
+    margin-right: 16px;
+    font-size: 1rem;
+    background-color: white;
+    color: #256D85;
+    text-transform: capitalize;
+    cursor: pointer;
+
+    &.error {
+        border: solid 1px rgb(255, 54, 54);
+        color: rgb(255, 54, 54);
+
+        &:hover {
+            background-color: rgb(255, 54, 54);
+            color: white;
+        }
+    }
+
+    &.delete {
+        border: solid 1px rgb(255, 54, 54);
+        color: rgb(255, 54, 54);
+        margin-bottom: 10px;
+
+        &:hover {
+            background-color: rgb(255, 54, 54);
+            color: white;
+        }
+    }
+
+    &:hover {
+        background-color: #256D85;
+        color: white;
+    }
+}

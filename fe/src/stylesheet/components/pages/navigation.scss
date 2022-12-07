@@ -1,0 +1,54 @@
+.navigation-container {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    background-color: #06283D;
+
+    .navigation-item {
+        width: 200px;
+        display: flex;
+        align-items: center;
+        float: right;
+        padding: 16px 20px;
+        margin: 6px 0;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+        font-size: 1rem;
+        color: white;
+        cursor: pointer;
+
+        .icon {
+            padding-right: 10px;
+        }
+
+        &:hover {
+            background-color: white;
+            color: #06283D;
+        }
+
+        &.actived {
+            background-color: white;
+            color: #06283D;
+        }
+    }
+}
+
+.logo-container {
+    padding: 20px 0;
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .logo-name {
+        color: white;
+    }
+
+    .logo-image {
+        color: white;
+        font-size: 2rem;
+        padding-right: 10px;
+    }
+}

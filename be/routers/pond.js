@@ -4,6 +4,20 @@ const uuid = require('uuid');
 const moment = require('moment');
 const connection = require("../config/dbconnection");
 
+//Get all ponds
+router.get('/', async (req, res) => {
+    try {
+        let sql = "SELECT * FROM POND;";
+        connection.query(sql, (err, results) => {
+            if (err) res.status(500).json(err);
+
+            res.status(200).json(results);
+        })
+    } catch (error) {
+        res.status(500).json(error);
+    }
+})
+
 //Get info of a pond
 router.get('/:id', async (req, res) => {
     try {

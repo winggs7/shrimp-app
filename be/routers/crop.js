@@ -4,7 +4,22 @@ const uuid = require('uuid');
 const moment = require('moment');
 const connection = require("../config/dbconnection");
 
-//Get info of a pond
+//Get all crops
+router.get('/pond/:pondID', async (req, res) => {
+    try {
+        let pondID = req.params.pondID;
+        let sql = "SELECT * FROM CROP WHERE CROP.pondID = ?;";
+        connection.query(sql, pondID, (err, results) => {
+            if (err) res.status(500).json(err);
+
+            res.status(200).json(results);
+        })
+    } catch (error) {
+        res.status(500).json(error);
+    }
+})
+
+//Get info of a crop
 router.get('/:id', async (req, res) => {
     try {
         let id = req.params.id;
@@ -23,7 +38,27 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-//Create a pond
+//Get all the stat in a crop
+router.get('/stat/:id', async (req, res) => {
+    try {
+        let cropID = req.params.id;
+
+        let sql = "SELECT * FROM CROP_STAT WHERE CROP_STAT.cropID = ?;";
+
+        cropID && connection.query(sql, cropID, (err, results) => {
+            if (err) res.status(500).json(err);
+
+            results.length > 0 ?
+                res.status(200).json(results) :
+                res.status(200).json("Cant find any history!");
+        })
+
+    } catch (error) {
+        res.status(500).json(error);
+    }
+})
+
+//Create a crop
 router.post('/', async (req, res) => {
     try {
         let id = uuid.v4();
@@ -78,7 +113,7 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-//Update a pond
+//Update a crop
 router.put('/:id', async (req, res) => {
     try {
         let id = req.params.id;
@@ -116,11 +151,65 @@ router.post('/stat/:id', async (req, res) => {
     try {
 
         let id = req.params.id;
-        let statId = req.body.statID;
+        let statIds = req.body.statIDs;
 
-        let sql = "INSERT INTO CROP_STAT (cropID, statID) VALUES (?, ?);";
+        const stats = statIds.split(',');
+        let sqlOptions = '';
+        const statsObj = [];
 
-        id && connection.query(sql, [id, statId], (err, results) => {
+        if (Array.isArray(stats)) {
+            stats.map((stat, index) => {
+                if (stats.length - 1 === index) {
+                    sqlOptions += '(?,?)';
+                } else {
+                    sqlOptions += '(?,?), ';
+                }
+                statsObj.push(id);
+                statsObj.push(stat);
+            })
+        }
+
+        let sql = `INSERT INTO CROP_STAT (cropID, statID) VALUES {0};`;
+        let newSql = sql.replace('{0}', sqlOptions);
+
+        id && connection.query(newSql, statsObj, (err, results) => {
+            if (err) res.status(500).json(err);
+            res.status(200).json(results);
+        })
+
+    } catch (error) {
+        res.status(500).json(error);
+    }
+})
+
+//delete stat for crop
+router.delete('/stat/:id', async (req, res) => {
+    try {
+
+        let id = req.params.id;
+        let statIds = req.body.statIDs;
+
+        const stats = statIds.split(',');
+        let sqlOptions = '';
+        const statsObj = [id];
+
+        if (Array.isArray(stats)) {
+            stats.map((stat, index) => {
+                if (index === 0) {
+                    sqlOptions += 'CROP_STAT.statID = ? ';
+                } else {
+                    sqlOptions += 'OR CROP_STAT.statID = ? ';
+                }
+                statsObj.push(stat);
+            })
+        }
+
+        let sql = `DELETE FROM CROP_STAT WHERE CROP_STAT.cropID = ? AND ({0});`;
+        let newSql = sql.replace('{0}', sqlOptions);
+
+        console.log(newSql)
+
+        id && connection.query(newSql, statsObj, (err, results) => {
             if (err) res.status(500).json(err);
             res.status(200).json(results);
         })
