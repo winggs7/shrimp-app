@@ -50,7 +50,7 @@ router.get('/stat/:id', async (req, res) => {
 
             results.length > 0 ?
                 res.status(200).json(results) :
-                res.status(200).json("Cant find any history!");
+                res.status(200).json("");
         })
 
     } catch (error) {
@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
 
             connection.query(sql, [id, pondID, type, number, date], (err, results) => {
                 if (err) res.status(500).json(err);
-                res.status(200).json(results);
+                res.status(200).json(id);
             })
         }
     } catch (error) {
@@ -224,14 +224,14 @@ router.get('/history/all/:id', async (req, res) => {
     try {
         let cropID = req.params.id;
 
-        let sql = "SELECT * FROM DAILY_HISTORY WHERE DAILY_HISTORY.cropID = ?;";
+        let sql = "SELECT * FROM DAILY_HISTORY WHERE DAILY_HISTORY.cropID = ? ORDER BY history_date DESC;";
 
         cropID && connection.query(sql, cropID, (err, results) => {
             if (err) res.status(500).json(err);
 
             results.length > 0 ?
                 res.status(200).json(results) :
-                res.status(200).json("Cant find any history!");
+                res.status(200).json("");
         })
 
     } catch (error) {
@@ -265,15 +265,16 @@ router.post('/history', async (req, res) => {
         let id = uuid.v4();
         let cropID = req.body.cropID;
         let statID = req.body.statID;
+        let isDanger = req.body.isDanger;
 
-        let date = moment().format('YYYY-MM-DD hh:mm:ss');
+        let date = moment().format('YYYY-MM-DD HH:mm:ss');
         let num_stat = req.body.num_stat;
         let description = req.body.description;
 
-        let sql = "INSERT INTO DAILY_HISTORY (ID, cropID, statID, history_date, num_stat, description) VALUES (?,?,?,?,?,?)"
+        let sql = "INSERT INTO DAILY_HISTORY (ID, cropID, statID, history_date, num_stat, isDanger ,description) VALUES (?,?,?,?,?,?,?)"
 
         if (id && cropID && statID && num_stat) {
-            connection.query(sql, [id, cropID, statID, date, num_stat, description], (err, results) => {
+            connection.query(sql, [id, cropID, statID, date, num_stat, isDanger, description], (err, results) => {
                 if (err) res.status(500).json(err);
                 res.status(200).json(results);
             })

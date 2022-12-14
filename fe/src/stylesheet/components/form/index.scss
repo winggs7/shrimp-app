@@ -9,6 +9,15 @@
     justify-content: center;
     align-items: center;
 
+    &.history {
+        .shrimpForm {
+            position: relative;
+            height: 90vh;
+            width: 80%;
+            overflow: hidden;
+        }
+    }
+
     .shrimpForm {
         background-color: white;
         padding: 20px;
@@ -22,5 +31,22 @@
         font-weight: 500;
         color: #06283D;
         margin-bottom: 10px;
+    }
+}
+
+.history-container {
+    overflow-y: scroll;
+    margin-top: 20px;
+    height: 80%;
+
+    .history-item {
+        border-bottom: 1px solid black;
+        padding-bottom: 10px;
+        font-size: 1rem;
+
+        .date {
+            width: 100%;
+            font-weight: bold;
+        }
     }
 }

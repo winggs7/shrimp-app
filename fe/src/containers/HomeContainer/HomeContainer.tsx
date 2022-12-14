@@ -10,6 +10,7 @@ import AddCrop from '../../components/form/AddCrop'
 import SetStatRange from '../../components/form/SetStatRange'
 import WarningBox from '../../components/base/WarningBox'
 import AssignStats from '../../components/form/AssignStats'
+import ShowHistory from '../../components/form/ShowHistory'
 
 export const MENU: any = {
     HOME: 'home',
@@ -23,6 +24,7 @@ export const FORM: any = {
     SETSTAT: 'setstat',
     DELETE: 'delete',
     ASSIGNSTAT: 'assignstat',
+    SHOWHISTORY: 'showhistory',
     NONE: ''
 }
 
@@ -31,16 +33,20 @@ export default function HomeContainer() {
     const [form, setForm] = useState<string>('');
     const [pondID, setPondID] = useState<string>('');
     const [cropID, setCropID] = useState<string>('');
+    const [crop, setCrop] = useState<any>();
+    const [isCropView, setIsCropView] = useState<boolean>(false);
     const [warning, setWarning] = useState<any>({ action: '', id: '' });
 
     const onChangeNav = (nav: string, ID?: string) => {
         ID && setPondID(ID);
+        setIsCropView(false);
         setForm('');
         setMenuItem(nav);
     }
 
     const onActionForm = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, form: string, values: any, type?: string) => {
         if (form === 'submit') {
+            e.preventDefault();
             if (type === FORM.ADDPOND) {
                 try {
                     const pond = { ...values };
@@ -51,13 +57,14 @@ export default function HomeContainer() {
             } else if (type === FORM.ADDCROP) {
                 try {
                     const crop = { ...values };
-                    await axios.post('http://localhost:7000/crop/', crop);
+                    const res = await axios.post('http://localhost:7000/crop/', crop);
+                    setCrop({ ...crop, ID: res.data });
+
                 } catch (error) {
                     console.log(error);
                 }
             } else if (type === FORM.SETSTAT) {
                 try {
-                    e.preventDefault();
                     const stat = { ...values };
                     await axios.put('http://localhost:7000/stat/', stat);
                 } catch (error) {
@@ -71,8 +78,15 @@ export default function HomeContainer() {
                     console.log(error);
                 }
             }
+            setForm(FORM.NONE);
+        } else {
+            setForm(form);
         }
-        setForm(form);
+    }
+
+    const onGoIntoCropDetail = (cropID?: string) => {
+        cropID && setCropID(cropID);
+        setIsCropView(true);
     }
 
     const onDeleteValue = async (action?: string, id?: string) => {
@@ -122,6 +136,8 @@ export default function HomeContainer() {
             return (<SetStatRange onActionForm={onActionForm} />);
         } else if (form === FORM.ASSIGNSTAT) {
             return (<AssignStats onActionForm={onActionForm} cropID={cropID} />);
+        } else if (form === FORM.SHOWHISTORY) {
+            return (<ShowHistory onActionForm={onActionForm} cropID={cropID} />);
         } else {
             return '';
         }
@@ -144,10 +160,14 @@ export default function HomeContainer() {
                     )}
                     {menuItem === MENU.MANAGE && (
                         <Manage
+                            cropID={cropID}
                             pondID={pondID}
+                            crop={crop}
+                            isCropView={isCropView}
                             onActionForm={onActionForm}
                             onOpenWarningDelete={onOpenWarningDelete}
                             onSetCropID={onSetCropID}
+                            onGoIntoCropDetail={onGoIntoCropDetail}
                         />
                     )}
                     {menuItem === MENU.SETTING && (

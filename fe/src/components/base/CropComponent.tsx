@@ -4,18 +4,21 @@ import CropItem from './CropItem'
 import ShrimpButton from './ShrimpButton';
 import CropDetail from './CropDetail';
 import DeleteButton from './DeleteButton';
+import moment from 'moment';
 
 export interface Props {
+    cropID: string,
     pondID: any,
+    crop: object,
+    isCropView: boolean,
     onActionForm: Function,
     onOpenWarningDelete: Function,
-    onSetCropID: Function
+    onSetCropID: Function,
+    onGoIntoCropDetail: Function
 }
 
-export default function CropComponent({ pondID, onActionForm, onOpenWarningDelete, onSetCropID }: Props) {
-    const [isCropView, setIsCropView] = useState<boolean>(false);
-    const [crops, setCrops] = useState([]);
-    const [cropID, setCropID] = useState<string>('');
+export default function CropComponent({ cropID, pondID, crop, isCropView, onActionForm, onOpenWarningDelete, onSetCropID, onGoIntoCropDetail }: Props) {
+    const [crops, setCrops] = useState<any[]>([]);
 
     useEffect(() => {
         const getCrops = async () => {
@@ -30,11 +33,17 @@ export default function CropComponent({ pondID, onActionForm, onOpenWarningDelet
         pondID && getCrops();
     }, [pondID])
 
-    const onGoIntoCropDetail = (cropID?: string) => {
-        cropID && setCropID(cropID);
-        onSetCropID(cropID);
-        setIsCropView(true);
-    }
+    useEffect(() => {
+        const cropsData = [...crops];
+        cropsData.push({ ...crop, startDate: moment(new Date()) });
+        setCrops(cropsData)
+    }, [crop])
+
+    useEffect(() => {
+        if (isCropView) {
+            onSetCropID(cropID);
+        }
+    }, [isCropView])
 
     return (
         <>

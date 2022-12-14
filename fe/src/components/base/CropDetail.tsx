@@ -14,7 +14,7 @@ export interface Props {
 
 export default function CropDetail({ cropID, onOpenWarningDelete, onActionForm }: Props) {
     const [crop, setCrop] = useState([]);
-    const [cropsStat, setCropsStat] = useState([]);
+    const [cropsStat, setCropsStat] = useState<any>([]);
 
     const stat_array = ['pH', 'Temperature'];
 
@@ -23,6 +23,7 @@ export default function CropDetail({ cropID, onOpenWarningDelete, onActionForm }
             try {
                 const reponse = await axios.get('http://localhost:7000/crop/stat/' + cropID);
                 reponse && setCropsStat(reponse.data);
+
                 const reponse_2 = await axios.get('http://localhost:7000/crop/' + cropID);
                 reponse_2 && setCrop(reponse_2.data);
             } catch (error) {
@@ -54,10 +55,17 @@ export default function CropDetail({ cropID, onOpenWarningDelete, onActionForm }
                     return <StatComponent
                         key={id}
                         id={stat['statID']}
+                        cropID={cropID}
                         name={stat_array[parseInt(stat['statID']) - 1]}
                     />
                 })
             )}
+            <ShrimpButton
+                form={FORM.SHOWHISTORY}
+                name={'View histories'}
+                onActionForm={onActionForm}
+                options={cropID}
+            />
         </>
     )
 }

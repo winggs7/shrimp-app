@@ -5,13 +5,17 @@ import Weather from '../base/Weather';
 import CropComponent from '../base/CropComponent';
 
 export interface Props {
+    cropID: string,
     pondID: string,
+    crop: object,
+    isCropView: boolean,
     onActionForm: Function,
     onOpenWarningDelete: Function,
-    onSetCropID: Function
+    onSetCropID: Function,
+    onGoIntoCropDetail: Function
 }
 
-export default function Manage({ pondID, onActionForm, onOpenWarningDelete, onSetCropID }: Props) {
+export default function Manage({ cropID, pondID, crop, isCropView, onActionForm, onOpenWarningDelete, onSetCropID, onGoIntoCropDetail }: Props) {
 
     const [name, setName] = useState<string>('');
 
@@ -41,10 +45,14 @@ export default function Manage({ pondID, onActionForm, onOpenWarningDelete, onSe
                                 Pond: {name}
                             </div>
                             <CropComponent
+                                cropID={cropID}
                                 pondID={pondID}
+                                crop={crop}
+                                isCropView={isCropView}
                                 onActionForm={onActionForm}
                                 onOpenWarningDelete={onOpenWarningDelete}
                                 onSetCropID={onSetCropID}
+                                onGoIntoCropDetail={onGoIntoCropDetail}
                             />
                         </>
                     ) : (
