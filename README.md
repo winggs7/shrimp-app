@@ -4,6 +4,6 @@ Create a file .env in be folder:
 
 How to run:
 - Open terminal
-- Change directory: cd be
+- Change directory: cd be (and) cd fe
 - Install libs: npm i
 - Run: npm start
