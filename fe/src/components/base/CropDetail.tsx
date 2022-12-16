@@ -51,7 +51,7 @@ export default function CropDetail({ cropID, onOpenWarningDelete, onActionForm }
                 options={cropID}
             />
             {Array.isArray(cropsStat) && (
-                cropsStat?.map((stat, id) => {
+                cropsStat && cropsStat?.map((stat, id) => {
                     return <StatComponent
                         key={id}
                         id={stat['statID']}

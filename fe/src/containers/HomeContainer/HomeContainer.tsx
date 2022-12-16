@@ -103,6 +103,12 @@ export default function HomeContainer() {
             } catch (error) {
                 console.log(error);
             }
+        } else if (action === 'deleteHistory') {
+            try {
+                await axios.delete('http://localhost:7000/crop/history/' + id);
+            } catch (error) {
+                console.log(error);
+            }
         }
         if (action === 'cancel') {
             setWarning({ action: '', id: '' })
@@ -137,7 +143,7 @@ export default function HomeContainer() {
         } else if (form === FORM.ASSIGNSTAT) {
             return (<AssignStats onActionForm={onActionForm} cropID={cropID} />);
         } else if (form === FORM.SHOWHISTORY) {
-            return (<ShowHistory onActionForm={onActionForm} cropID={cropID} />);
+            return (<ShowHistory onActionForm={onActionForm} cropID={cropID} onOpenWarningDelete={onOpenWarningDelete} />);
         } else {
             return '';
         }

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import ShrimpButton from '../base/ShrimpButton'
 import moment from 'moment';
+import DeleteButton from '../base/DeleteButton';
 
 export interface Props {
     cropID: string,
-    onActionForm: Function
+    onActionForm: Function,
+    onOpenWarningDelete: Function
 }
 
-export default function ShowHistory({ cropID, onActionForm }: Props) {
+export default function ShowHistory({ cropID, onActionForm, onOpenWarningDelete }: Props) {
     const [histories, setHistories] = useState<any[]>([]);
 
     const stat_array = ['pH', 'Temperature'];
@@ -37,9 +39,15 @@ export default function ShowHistory({ cropID, onActionForm }: Props) {
                         form={''}
                         type={'error'}
                     />
+                    <DeleteButton
+                        onOpenWarningDelete={onOpenWarningDelete}
+                        id={cropID}
+                        action={"deleteHistory"}
+                        name={"histories"}
+                    />
                 </div>
                 <div className="history-container">
-                    {histories.map((history: any, id: any) => {
+                    {histories && histories.map((history: any, id: any) => {
                         return (<div key={id} className="history-item">
                             <div className="date">
                                 Date: {moment(history['history_date']).format('DD-MM-YYYY HH:mm:ss')}

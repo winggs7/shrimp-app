@@ -290,7 +290,7 @@ router.delete('/history/:id', async (req, res) => {
     try {
         let id = req.params.id;
 
-        let sql = "DELETE FROM DAILY_HISTORY AS D WHERE D.ID = ?;";
+        let sql = "DELETE FROM DAILY_HISTORY AS D WHERE D.cropID = ?;";
 
         id && connection.query(sql, id, (err, results) => {
             if (err) res.status(500).json(err);

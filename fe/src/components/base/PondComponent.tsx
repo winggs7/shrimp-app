@@ -27,7 +27,7 @@ export default function PondComponent({ onChangeNav }: Props) {
                 Pond List
             </div>
             <div className="pond-list">
-                {ponds.map((pond, id) => {
+                {ponds && ponds.map((pond, id) => {
                     return (
                         <PondItem
                             key={id}

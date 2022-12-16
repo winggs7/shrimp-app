@@ -60,7 +60,7 @@ export default function CropComponent({ cropID, pondID, crop, isCropView, onActi
                     </div>
                     <ShrimpButton form={'addcrop'} name={'add crop'} onActionForm={onActionForm} />
                     <div className="crop-list">
-                        {crops.map((crop, id) => {
+                        {crops && crops.map((crop, id) => {
                             return (
                                 <CropItem
                                     key={id}

@@ -45,7 +45,7 @@ export default function StatComponent({ name, id, cropID }: Props) {
                     colorData.shift();
                 }
                 var time = moment().format('LT');
-                var datapH: number = parseFloat(randomData(stat[0].from_stat - 2, stat[0].to_stat + 2));
+                var datapH: number = parseFloat(randomData(stat[0].from_stat - 2, stat[0].to_stat + 2, currentStat));
                 setCurrentStat(datapH);
 
                 if (datapH < stat[0].from_stat || datapH > stat[0].to_stat) {
