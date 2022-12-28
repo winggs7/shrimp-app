@@ -42,10 +42,10 @@ export default function PondItem({ ID, name, area, deep, startDate, onChangeNav 
                 Last {getDiffDate(startDate)}
             </div>
             <div className="content">
-                Area: {area}km
+                Area: {area} km
             </div>
             <div className="content">
-                Population: 1000 shrimps
+                Deep: {deep} km<sup>2</sup>
             </div>
             <div className="link">
                 Go to detail

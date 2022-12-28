@@ -46,7 +46,6 @@ export default function HomeContainer() {
 
     const onActionForm = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, form: string, values: any, type?: string) => {
         if (form === 'submit') {
-            e.preventDefault();
             if (type === FORM.ADDPOND) {
                 try {
                     const pond = { ...values };
@@ -55,6 +54,7 @@ export default function HomeContainer() {
                     console.log(error);
                 }
             } else if (type === FORM.ADDCROP) {
+                e.preventDefault();
                 try {
                     const crop = { ...values };
                     const res = await axios.post('http://localhost:7000/crop/', crop);
@@ -64,6 +64,7 @@ export default function HomeContainer() {
                     console.log(error);
                 }
             } else if (type === FORM.SETSTAT) {
+                e.preventDefault();
                 try {
                     const stat = { ...values };
                     await axios.put('http://localhost:7000/stat/', stat);
@@ -71,6 +72,7 @@ export default function HomeContainer() {
                     console.log(error);
                 }
             } else if (type === FORM.ASSIGNSTAT) {
+                // e.preventDefault();
                 try {
                     const { cropID, statConfirm } = values;
                     await axios.post('http://localhost:7000/crop/stat/' + cropID, { statIDs: statConfirm.toString() });
