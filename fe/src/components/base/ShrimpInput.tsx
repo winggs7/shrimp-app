@@ -4,10 +4,11 @@ export interface Props {
     title: string,
     require: boolean,
     name?: string,
+    value?: string | number,
     onChangeInput: Function
 }
 
-export default function ShrimpInput({ title, require, name, onChangeInput }: Props) {
+export default function ShrimpInput({ title, require, name, value, onChangeInput }: Props) {
 
     return (
         <div className="shrimpInput">
@@ -17,6 +18,7 @@ export default function ShrimpInput({ title, require, name, onChangeInput }: Pro
             <input
                 type="text"
                 required={require}
+                value={value}
                 onChange={(e) => onChangeInput(e, name)}
             />
         </div>

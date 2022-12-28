@@ -3,6 +3,7 @@ import { ChartData, ScatterDataPoint } from 'chart.js';
 import LineChart from './LineChart';
 import moment from 'moment';
 import { randomData } from '../../services/MockDatapH';
+import ShrimpInput from './ShrimpInput'
 import axios from 'axios';
 
 
@@ -19,12 +20,37 @@ export default function StatComponent({ name, id, cropID }: Props) {
     const [datas, setDatas] = useState<number[]>([]);
     const [borderColor, setBorderColor] = useState<string[]>([]);
     const [currentStat, setCurrentStat] = useState<number>(0.0);
+    const [period, setPeriod] = useState<number>(3000);
+    const [checkPeriod, setCheckPeriod] = useState<number>(0);
+    const [warning, setWarning] = useState<boolean>(false);
+
+    useEffect(() => {
+        const warning = async () => {
+            try {
+                let histories: any = await axios.get("http://localhost:7000/crop/history/all/" + cropID);
+                histories.data !== '' && setWarning(true);
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        warning();
+    }, [])
+
+    useEffect(() => {
+        if (warning === true) {
+            alert("Please check your histories! There are some problem with your pond!");
+            setWarning(false);
+        }
+    }, [warning]);
 
     useEffect(() => {
         const getStat = async () => {
             try {
                 const response = await axios.get('http://localhost:7000/stat/' + id);
                 response && setStat(response.data);
+                setCheckPeriod(period);
+
             } catch (error) {
                 console.log(error)
             }
@@ -63,16 +89,22 @@ export default function StatComponent({ name, id, cropID }: Props) {
             } else {
                 clearInterval(intervalPH);
             }
-        }, 3000);
+        }, period);
 
         return () => {
             clearInterval(intervalPH);
         }
-    }, [datas, labels, borderColor, stat])
+    }, [datas, labels, borderColor, stat, period])
 
     useEffect(() => {
         const min = stat[0]?.from_stat;
         const max = stat[0]?.to_stat;
+        let description = '';
+        if (currentStat < min) {
+            description += 'Your pH is lower than the normal! Please check your soil or the weather!'
+        } else if (currentStat > max) {
+            description += 'Your pH is higher than the normal! Please check your enviroment!'
+        }
 
         if (currentStat < min || currentStat > max) {
             const history = {
@@ -80,7 +112,7 @@ export default function StatComponent({ name, id, cropID }: Props) {
                 statID: id,
                 isDanger: true,
                 num_stat: currentStat,
-                description: ''
+                description: description
             }
 
             const saveHistory = async (history: any) => {
@@ -134,6 +166,19 @@ export default function StatComponent({ name, id, cropID }: Props) {
         <div className="stat-container">
             <div className="stat__name">
                 {name}: Current: {datas[datas.length - 1]}
+            </div>
+            <div className="periodField">
+                <div className="shrimpInput">
+                    <div className="input__title">
+                        Period (s):
+                    </div>
+                    <input
+                        type="text"
+                        value={checkPeriod / 1000}
+                        onChange={(e) => setCheckPeriod(parseInt(e.target.value) * 1000)}
+                    />
+                </div>
+                <button onClick={() => setPeriod(checkPeriod)}>Accept</button>
             </div>
             <div className="stat-chart">
                 <LineChart

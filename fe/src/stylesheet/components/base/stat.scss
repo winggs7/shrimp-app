@@ -1,6 +1,6 @@
 .stat-container {
     width: 100%;
-    height: 500px;
+    height: 600px;
     background-color: #DFF6FF;
     padding: 20px;
     margin: 10px 0;
@@ -16,5 +16,44 @@
     .stat-chart {
         width: 100%;
         height: 85%;
+    }
+}
+
+.periodField {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .shrimpInput {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 0;
+
+        .input__title {
+            width: auto;
+            padding-right: 10px;
+        }
+
+        input {
+            width: 100px;
+        }
+    }
+
+    button {
+        border: solid 1px #256D85;
+        border-radius: 4px;
+        padding: 6px 10px;
+        margin-left: 16px;
+        font-size: 1rem;
+        background-color: white;
+        color: #256D85;
+        text-transform: capitalize;
+        height: fit-content;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #256D85;
+            color: white;
+        }
     }
 }

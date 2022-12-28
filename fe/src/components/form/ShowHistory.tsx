@@ -58,6 +58,9 @@ export default function ShowHistory({ cropID, onActionForm, onOpenWarningDelete 
                             <div className="number">
                                 Index: {history['num_stat']}
                             </div>
+                            <div className="desc">
+                                Description: {history['description']}
+                            </div>
                         </div>)
                     })}
                 </div>
