@@ -1,24 +1,15 @@
-import React from 'react'
+import React, { useEffect } from "react";
 
 export interface Props {
-    form: string,
-    name?: string,
-    type?: string,
-    onActionForm: Function,
-    values?: any,
-    typeAction?: string,
-    options?: any
+  title?: string;
+  type?: "outlined" | "submit" | "cancel" | "error";
+  onClick?: any;
 }
 
-export default function ShrimpButton({ form, name, onActionForm, type, values, typeAction, options }: Props) {
-
-    return (
-        <button
-            className={`shrimp-button ${type === 'error' && 'error'}`}
-            onClick={(e) => { onActionForm(e, form, values, typeAction) }}
-            type={form === 'submit' ? 'submit' : 'reset'}
-        >
-            {name}
-        </button>
-    )
+export default function ShrimpButton({ title, onClick, type }: Props) {
+  return (
+    <div className={`shrimp-button ${type}`} onClick={onClick}>
+      {title}
+    </div>
+  );
 }

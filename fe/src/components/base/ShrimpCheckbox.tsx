@@ -1,24 +1,32 @@
-import React from 'react'
+import React from "react";
 
 export interface Props {
-    stats: any,
-    onChangeCheckBox: Function
+  items: any;
+  checkedItems?: any;
+  onChange?: any;
 }
 
-export default function ShrimpCheckbox({ stats, onChangeCheckBox }: Props) {
-
-    return (
-        <div className="shrimpCheckbox">
-            {
-                stats && stats.map((stat: any, id: any) => {
-                    return (
-                        <div key={id} className={"checkbox-item"}>
-                            <input type="checkbox" value={stat.ID} onChange={(e) => { onChangeCheckBox(e) }} />
-                            {stat.name}
-                        </div>
-                    );
-                })
-            }
-        </div>
-    )
+export default function ShrimpCheckbox({
+  items,
+  checkedItems,
+  onChange,
+}: Props) {
+  return (
+    <div className="shrimpCheckbox">
+      {items &&
+        items.map((item: any, id: any) => {
+          return (
+            <div key={item?.id} className={"checkbox-item"}>
+              <input
+                type="checkbox"
+                value={item?.id}
+                onChange={(e) => onChange(e)}
+                checked={checkedItems?.includes(item.id) ? true : false}
+              />
+              {item?.name}
+            </div>
+          );
+        })}
+    </div>
+  );
 }

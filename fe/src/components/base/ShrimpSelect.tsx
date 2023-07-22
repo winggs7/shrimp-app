@@ -1,18 +1,26 @@
-import React from 'react'
+import React from "react";
 
 export interface Props {
-    value: string,
-    onHandleChangeStat: Function,
+  items?: any;
+  value?: string;
+  onChange: Function;
+  title?: string;
 }
 
-export default function ShrimpSelect({ value, onHandleChangeStat }: Props) {
-    return (
-        <div className="shrimpSelect">
-            Pick your favorite flavor:
-            <select value={value} onChange={(e) => onHandleChangeStat(e)}>
-                <option value="1">pH</option>
-                <option value="2">Temperature</option>
-            </select>
-        </div>
-    )
+export default function ShrimpSelect({ value, onChange, title, items }: Props) {
+  return (
+    <div className="shrimpSelect">
+      {title && <>Pick your favorite flavor:</>}
+      <select value={value} onChange={() => onChange}>
+        {items?.map((item: any) => {
+          return (
+            <>
+              <option value={item?.key}>{item?.name}</option>
+              <option value={item?.key}>{item?.name}</option>
+            </>
+          );
+        })}
+      </select>
+    </div>
+  );
 }

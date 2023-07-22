@@ -1,26 +1,24 @@
-import React from 'react'
+import React from "react";
 
 export interface Props {
-    title: string,
-    require: boolean,
-    name?: string,
-    value?: string | number,
-    onChangeInput: Function
+  title: string;
+  require: boolean;
+  value?: string | number;
+  onInput: any;
 }
 
-export default function ShrimpInput({ title, require, name, value, onChangeInput }: Props) {
-
-    return (
-        <div className="shrimpInput">
-            <div className="input__title">
-                {title}
-            </div>
-            <input
-                type="text"
-                required={require}
-                value={value}
-                onChange={(e) => onChangeInput(e, name)}
-            />
-        </div>
-    )
+export default function ShrimpInput({ title, require, value, onInput }: Props) {
+  return (
+    <div className="shrimpInput">
+      {title && <div className="input__title">{title}</div>}
+      <input
+        type="text"
+        // required={require}
+        value={value}
+        onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onInput(e.target.value)
+        }
+      />
+    </div>
+  );
 }

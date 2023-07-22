@@ -1,191 +1,160 @@
-import React, { useEffect, useState } from 'react'
-import { ChartData, ScatterDataPoint } from 'chart.js';
-import LineChart from './LineChart';
-import moment from 'moment';
-import { randomData } from '../../services/MockDatapH';
-import ShrimpInput from './ShrimpInput'
-import axios from 'axios';
-
+import React, { useEffect, useState } from "react";
+import { ChartData, ScatterDataPoint } from "chart.js";
+import LineChart from "./LineChart";
+import moment from "moment";
+import { randomData } from "../../utils/common-helper";
+import axios from "axios";
+import { CropApi } from "../../Apis/crop.api";
+import { CreateHistory } from "../../Model/history";
+import { StatApi } from "../../Apis/stat.api";
+import { Stat } from "../../Model/stat";
+import { Crop } from "../../Model/crop";
+import ShrimpButton from "./ShrimpButton";
 
 export interface Props {
-    name: string,
-    id: string,
-    cropID: string
+  statId: string;
+  crop: Crop;
 }
 
-export default function StatComponent({ name, id, cropID }: Props) {
-    const [stat, setStat] = useState<any[]>([]);
+export default function StatComponent({ statId, crop }: Props) {
+  const [stat, setStat] = useState<Stat>();
+  const [labels, setLabels] = useState<any[]>([]);
+  const [datas, setDatas] = useState<number[]>([]);
+  const [borderColor, setBorderColor] = useState<string[]>([]);
+  const [currentStat, setCurrentStat] = useState<number>(0.0);
+  const [period, setPeriod] = useState<number>(3000);
+  const [checkPeriod, setCheckPeriod] = useState<number>(3000);
 
-    const [labels, setLabels] = useState<any[]>([]);
-    const [datas, setDatas] = useState<number[]>([]);
-    const [borderColor, setBorderColor] = useState<string[]>([]);
-    const [currentStat, setCurrentStat] = useState<number>(0.0);
-    const [period, setPeriod] = useState<number>(3000);
-    const [checkPeriod, setCheckPeriod] = useState<number>(0);
-    const [warning, setWarning] = useState<boolean>(false);
+  useEffect(() => {
+    StatApi.getStatById(statId).then((data) => {
+      setStat(data[0]);
+    });
+  }, [statId]);
+  useEffect(() => {
+    const intervalPH = setInterval(() => {
+      if (Array.isArray(stat) && stat.length > 0) {
+        const chartData: number[] = [...datas];
+        const timeData: any[] = [...labels];
+        const colorData: string[] = [...borderColor];
 
-    useEffect(() => {
-        const warning = async () => {
-            try {
-                let histories: any = await axios.get("http://localhost:7000/crop/history/all/" + cropID);
-                histories.data !== '' && setWarning(true);
-
-            } catch (error) {
-                console.log(error)
-            }
+        if (chartData.length > 8) {
+          chartData.shift();
+          timeData.shift();
+          colorData.shift();
         }
-        warning();
-    }, [])
+        var time = moment().format("LT");
+        var datapH: number = parseFloat(
+          randomData(stat[0].from_stat - 2, stat[0].to_stat + 2, currentStat)
+        );
+        setCurrentStat(datapH);
 
-    useEffect(() => {
-        if (warning === true) {
-            alert("Please check your histories! There are some problem with your pond!");
-            setWarning(false);
+        if (datapH < stat[0].from_stat || datapH > stat[0].to_stat) {
+          colorData.push("#FF0000");
+        } else {
+          colorData.push("#1BFF00");
         }
-    }, [warning]);
+        setBorderColor(colorData);
 
-    useEffect(() => {
-        const getStat = async () => {
-            try {
-                const response = await axios.get('http://localhost:7000/stat/' + id);
-                response && setStat(response.data);
-                setCheckPeriod(period);
+        chartData.push(datapH);
+        setDatas(chartData);
 
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        getStat();
-    }, [id])
+        timeData.push(time);
+        setLabels(timeData);
+      } else {
+        clearInterval(intervalPH);
+      }
+    }, period);
 
-    useEffect(() => {
-        const intervalPH = setInterval(() => {
-            if (Array.isArray(stat) && stat.length > 0) {
-                const chartData: number[] = [...datas];
-                const timeData: any[] = [...labels];
-                const colorData: string[] = [...borderColor];
+    return () => {
+      clearInterval(intervalPH);
+    };
+  }, [datas, labels, borderColor, stat, period]);
 
-                if (chartData.length > 8) {
-                    chartData.shift();
-                    timeData.shift();
-                    colorData.shift();
-                }
-                var time = moment().format('LT');
-                var datapH: number = parseFloat(randomData(stat[0].from_stat - 2, stat[0].to_stat + 2, currentStat));
-                setCurrentStat(datapH);
+  useEffect(() => {
+    const min = stat?.from_stat;
+    const max = stat?.to_stat;
+    let description = "";
+    if (min && max) {
+      if (currentStat < min) {
+        description +=
+          "Your pH is lower than the normal! Please check your soil or the weather!";
+      } else if (currentStat > max) {
+        description +=
+          "Your pH is higher than the normal! Please check your enviroment!";
+      }
 
-                if (datapH < stat[0].from_stat || datapH > stat[0].to_stat) {
-                    colorData.push("#FF0000");
-                } else {
-                    colorData.push("#1BFF00");
-                }
-                setBorderColor(colorData);
+      if (currentStat < min || currentStat > max) {
+        const history: CreateHistory = {
+          cropId: crop.id,
+          statId: statId,
+          isDanger: true,
+          num_stat: currentStat,
+          description: description,
+        };
 
-                chartData.push(datapH);
-                setDatas(chartData);
-
-                timeData.push(time);
-                setLabels(timeData);
-            } else {
-                clearInterval(intervalPH);
-            }
-        }, period);
-
-        return () => {
-            clearInterval(intervalPH);
-        }
-    }, [datas, labels, borderColor, stat, period])
-
-    useEffect(() => {
-        const min = stat[0]?.from_stat;
-        const max = stat[0]?.to_stat;
-        let description = '';
-        if (currentStat < min) {
-            description += 'Your pH is lower than the normal! Please check your soil or the weather!'
-        } else if (currentStat > max) {
-            description += 'Your pH is higher than the normal! Please check your enviroment!'
-        }
-
-        if (currentStat < min || currentStat > max) {
-            const history = {
-                cropID: cropID,
-                statID: id,
-                isDanger: true,
-                num_stat: currentStat,
-                description: description
-            }
-
-            const saveHistory = async (history: any) => {
-                await axios.post('http://localhost:7000/crop/history', history);
-            }
-
-            saveHistory(history);
-        }
-
-    }, [currentStat])
-
-    const data: ChartData<"line", (number | ScatterDataPoint | null)[], unknown> = {
-        labels: labels,
-        datasets: [
-            {
-                label: 'pH: ',
-                data: datas,
-                backgroundColor: borderColor,
-                borderColor: "#3e95cd",
-                pointRadius: 5,
-            }
-        ]
+        CropApi.createCropHistory(history);
+      }
     }
+  }, [datas]);
 
-    const options: any = {
-        scales: {
-            x: {
-                title: {
-                    color: 'black',
-                    display: true,
-                    text: 'Time (Hours)',
-                    font: {
-                        size: 16
-                    }
-                }
-            },
-            y: {
-                title: {
-                    color: 'black',
-                    display: true,
-                    text: name,
-                    font: {
-                        size: 16
-                    }
-                }
-            },
+  const data: ChartData<"line", (number | ScatterDataPoint | null)[], unknown> =
+    {
+      labels: labels,
+      datasets: [
+        {
+          label: "pH: ",
+          data: datas,
+          backgroundColor: borderColor,
+          borderColor: "#3e95cd",
+          pointRadius: 5,
         },
-    }
+      ],
+    };
 
-    return (
-        <div className="stat-container">
-            <div className="stat__name">
-                {name}: Current: {datas[datas.length - 1]}
-            </div>
-            <div className="periodField">
-                <div className="shrimpInput">
-                    <div className="input__title">
-                        Period (s):
-                    </div>
-                    <input
-                        type="text"
-                        value={checkPeriod / 1000}
-                        onChange={(e) => setCheckPeriod(parseInt(e.target.value) * 1000)}
-                    />
-                </div>
-                <button onClick={() => setPeriod(checkPeriod)}>Accept</button>
-            </div>
-            <div className="stat-chart">
-                <LineChart
-                    data={data}
-                    options={options}
-                />
-            </div>
+  const options: any = {
+    scales: {
+      x: {
+        title: {
+          color: "black",
+          display: true,
+          text: "Time (Hours)",
+          font: {
+            size: 16,
+          },
+        },
+      },
+      y: {
+        title: {
+          color: "black",
+          display: true,
+          text: stat?.name,
+          font: {
+            size: 16,
+          },
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="stat-container">
+      <div className="stat__name">
+        {stat?.name}: Current: {datas[datas.length - 1]}
+      </div>
+      <div className="periodField">
+        <div className="shrimpInput">
+          <div className="input__title">Period (s):</div>
+          <input
+            type="text"
+            value={checkPeriod / 1000}
+            onChange={(e) => setCheckPeriod(parseInt(e.target.value) * 1000)}
+          />
         </div>
-    )
+        <ShrimpButton title="Accept" onClick={() => setPeriod(checkPeriod)} />
+      </div>
+      <div className="stat-chart">
+        <LineChart data={data} options={options} />
+      </div>
+    </div>
+  );
 }

@@ -1,82 +1,45 @@
-import React, { useState } from 'react'
-import ShrimpButton from '../base/ShrimpButton'
-import ShrimpInput from '../base/ShrimpInput';
-import ShrimpSelect from '../base/ShrimpSelect';
+import React, { useState, useEffect } from "react";
+import ShrimpButton from "../base/ShrimpButton";
+import ShrimpInput from "../base/ShrimpInput";
+import ShrimpSelect from "../base/ShrimpSelect";
+import { Stat } from "../../Model/stat";
+import { StatApi } from "../../Apis/stat.api";
 
-export interface Props {
-    onActionForm: Function
-}
+export default function SetStatRange() {
+  const [stats, setStats] = useState<Stat[]>([]);
+  const [id, setId] = useState<string>();
+  const [statFrom, setStatFrom] = useState<number>();
+  const [statTo, setStatTo] = useState<number>();
 
-interface STAT {
-    ID: string,
-    statFrom: number,
-    statTo: number
-}
+  useEffect(() => {
+    StatApi.getAllStats().then((result) => {
+      setStats(result);
+    });
+  }, []);
 
-export default function SetStatRange({ onActionForm }: Props) {
-    const [stat, setStat] = useState<STAT>({ ID: '1', statFrom: 0.0, statTo: 0.0 });
-
-    const onHandleChangeStat = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const value: string = e.target.value;
-        setStat({
-            ...stat,
-            ID: value
-        });
+  const onSave = () => {
+    if (statFrom && statTo && id) {
+      const data: Stat = {
+        id,
+        from_stat: statFrom,
+        to_stat: statTo,
+      };
+      StatApi.updateStat(data);
     }
+  };
 
-    const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>, name?: string) => {
-        const value = e.target.value;
-        if (name === 'maxstat') {
-            setStat({
-                ...stat,
-                statTo: parseFloat(value)
-            });
-        } else if (name === 'minstat') {
-            setStat({
-                ...stat,
-                statFrom: parseFloat(value)
-            });
-        }
-    }
-
-    return (
-        <div className="form-container">
-            <form className='shrimpForm' action="">
-                <div className="form__title">
-                    Set stat range
-                </div>
-                <ShrimpSelect
-                    value={stat.ID}
-                    onHandleChangeStat={onHandleChangeStat}
-                />
-                <ShrimpInput
-                    title={'Min stat'}
-                    require={true}
-                    name={'minstat'}
-                    onChangeInput={onChangeInput}
-                />
-                <ShrimpInput
-                    title={'Max stat'}
-                    require={true}
-                    name={'maxstat'}
-                    onChangeInput={onChangeInput}
-                />
-                <div className="form__button">
-                    <ShrimpButton
-                        name={'Accept'}
-                        onActionForm={onActionForm}
-                        form={'submit'}
-                        typeAction={'setstat'}
-                        values={stat}
-                    />
-                    <ShrimpButton
-                        name={'cancel'}
-                        onActionForm={onActionForm}
-                        form={''}
-                        type={'error'}
-                    />
-                </div>
-            </form>
+  return (
+    <div className="form-container">
+      <form className="shrimpForm" action="">
+        <div className="form__title">Set stat range</div>
+        <ShrimpSelect onChange={setId} items={stats} />
+        <ShrimpInput title={"Min stat"} require={true} onInput={setStatFrom} />
+        <ShrimpInput title={"Max stat"} require={true} onInput={setStatTo} />
+        <div className="form__button">
+          <ShrimpButton title={"Accept"} onClick={onSave} />
+          <ShrimpButton title={"cancel"} />
         </div>
-    )
+      </form>
+    </div>
+  );
 }

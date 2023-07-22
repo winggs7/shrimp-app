@@ -1,37 +1,24 @@
-import React from 'react'
-import { solid } from '@fortawesome/fontawesome-svg-core/import.macro'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { getDiffDate } from './PondItem'
+import React from "react";
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getDiffDate } from "../../utils/common-helper";
+import { Crop } from "../../Model/crop";
 
 export interface Props {
-    ID: string,
-    index: number,
-    type: string,
-    number: number,
-    startDate: Date,
-    onGoIntoCropDetail: Function,
+  crop: Crop;
+  onClick?: any;
 }
 
-export default function CropItem({ ID, index, type, number, startDate, onGoIntoCropDetail }: Props) {
-
-    return (
-        <div className='crop-item' onClick={() => { onGoIntoCropDetail(ID); }}>
-            <div className="name">
-                {index}.
-            </div>
-            <div className="content">
-                Type: {type}
-            </div>
-            <div className="content">
-                Population: {number}
-            </div>
-            <div className="content">
-                Last: {getDiffDate(startDate)}
-            </div>
-            <div className="link">
-                Go to detail
-                <FontAwesomeIcon icon={solid('chevron-right')} />
-            </div>
-        </div>
-    )
+export default function CropItem({ crop, onClick }: Props) {
+  return (
+    <div className="crop-item" onClick={() => onClick(crop)}>
+      <div className="content">Type: {crop.type}</div>
+      <div className="content">Population: {crop.number}</div>
+      <div className="content">Last: {getDiffDate(crop.startDate)}</div>
+      <div className="link">
+        Go to detail
+        <FontAwesomeIcon icon={solid("chevron-right")} />
+      </div>
+    </div>
+  );
 }

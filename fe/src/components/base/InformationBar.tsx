@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
 
-export default function InformationBar() {
+export interface Props {
+    user?: any,
+}
+
+export default function InformationBar({ user }: Props) {
     const [ponds, setPonds] = useState(0);
     const [area, setArea] = useState(0);
 
     useEffect(() => {
         try {
             const getInfo = async () => {
-                const respone = await axios.get('http://localhost:7000/pond');
+                const respone = await axios.get('http://localhost:7000/pond/' + user?.name);
                 var totalArea = respone.data.reduce(function (acc: number, pond: any) { return acc + pond['area']; }, 0);
 
                 setPonds(respone.data.length);
@@ -21,8 +25,6 @@ export default function InformationBar() {
         }
 
     }, [])
-
-
 
     return (
         <div className='rightside-container'>

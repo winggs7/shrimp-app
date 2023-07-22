@@ -1,46 +1,32 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import PondItem from './PondItem'
+import React, { useEffect, useState } from "react";
+import PondItem from "./PondItem";
+import { PondApi } from "../../Apis/pond.api";
+import { Pond } from "../../Model/pond";
 
 export interface Props {
-    onChangeNav: Function
+  user: any;
+  onChangeNav: Function;
+  reload?: boolean;
 }
 
-export default function PondComponent({ onChangeNav }: Props) {
-    const [ponds, setPonds] = useState([]);
+export default function PondComponent({ user, onChangeNav, reload }: Props) {
+  const [ponds, setPonds] = useState<Pond[]>();
 
-    useEffect(() => {
-        const getPonds = async () => {
-            try {
-                const response = await axios.get('http://localhost:7000/pond');
-                response && setPonds(response.data);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        getPonds();
-    }, [])
+  useEffect(() => {
+    PondApi.getPondsByUser(user?.name).then((result) => {
+      setPonds(result);
+    });
+  }, [reload]);
 
-    return (
-        <div className="pond-container">
-            <div className="title">
-                Pond List
-            </div>
-            <div className="pond-list">
-                {ponds && ponds.map((pond, id) => {
-                    return (
-                        <PondItem
-                            key={id}
-                            ID={pond['ID']}
-                            name={pond['name']}
-                            area={pond['area']}
-                            deep={pond['deep']}
-                            startDate={pond['startDate']}
-                            onChangeNav={onChangeNav}
-                        />
-                    )
-                })}
-            </div>
-        </div>
-    )
+  return (
+    <div className="pond-container">
+      <div className="title">Pond List</div>
+      <div className="pond-list">
+        {ponds &&
+          ponds.map((pond, id) => {
+            return <PondItem key={id} pond={pond} onChangeNav={onChangeNav} />;
+          })}
+      </div>
+    </div>
+  );
 }

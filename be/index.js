@@ -3,6 +3,7 @@ const app = express();
 var cors = require("cors");
 
 const connection = require('./config/dbconnection');
+const userRouter = require('./routers/user');
 const pondRouter = require('./routers/pond');
 const cropRouter = require('./routers/crop');
 const statRouter = require('./routers/stat');
@@ -19,6 +20,7 @@ connection.connect((err) => {
     console.log("DB connected!")
 })
 
+app.use('/user', userRouter);
 app.use('/pond', pondRouter);
 app.use('/crop', cropRouter);
 app.use('/stat', statRouter);

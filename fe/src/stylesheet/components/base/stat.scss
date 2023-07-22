@@ -27,6 +27,7 @@
     .shrimpInput {
         display: flex;
         flex-direction: row;
+        align-items: center;
         margin-bottom: 0;
 
         .input__title {
@@ -39,7 +40,7 @@
         }
     }
 
-    button {
+    .shrimp-button {
         border: solid 1px #256D85;
         border-radius: 4px;
         padding: 6px 10px;
