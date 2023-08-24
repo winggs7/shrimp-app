@@ -3,7 +3,8 @@ import HomeContainer from "./containers/HomeContainer/HomeContainer";
 import "./App.scss";
 import LoginContainer from "./containers/LoginContainer/LoginContainer";
 import { Route, Routes } from "react-router-dom";
-import Manage from "./components/pages/Manage";
+import { User } from "./Model/user";
+import { apiAxios } from ".";
 
 export const MENU: any = {
   HOME: "HOME",
@@ -12,23 +13,42 @@ export const MENU: any = {
 };
 
 export default function App() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | undefined>();
 
   useEffect(() => {
     if (!user) {
-      const userData: any = localStorage.getItem("user");
-      setUser(JSON.parse(userData));
+      const name = localStorage.getItem("name");
+      const access_token = localStorage.getItem("access_token");
+      const refresh_token = localStorage.getItem("refresh_token");
+      if (name && access_token && refresh_token) {
+        const user: User = {
+          name: name,
+          access_token: access_token,
+          refresh_token: refresh_token,
+        };
+        setUser(user);
+      }
     }
-  }, []);
+  }, [user]);
 
-  const onSetUser = (data: any) => {
-    localStorage.setItem("user", JSON.stringify(data));
-    setUser(data);
+  const onSetUser = (data: User) => {
+    if (data) {
+      localStorage.setItem("name", data.name);
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      apiAxios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${data.access_token}`;
+
+      setUser(data);
+    } else {
+      setUser(undefined);
+    }
   };
 
   return (
     <Routes>
-      {user !== null ? (
+      {user ? (
         <>
           <Route
             path="/"

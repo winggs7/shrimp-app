@@ -13,13 +13,7 @@ export interface Props {
 export default function PondItem({ pond, onChangeNav }: Props) {
   const navigate = useNavigate();
   return (
-    <div
-      className="pond-item"
-      // onClick={() => {
-      //   onChangeNav(MENU.MANAGE, pond.id);
-      // }}
-      onClick={() => navigate(`/crop/${pond.id}`)}
-    >
+    <div className="pond-item" onClick={() => navigate(`/crop/${pond.id}`)}>
       <div className="name">{pond.name}</div>
       <div className="content">Last {getDiffDate(pond.startDate)}</div>
       <div className="content">Area: {pond.area} km</div>

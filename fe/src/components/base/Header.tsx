@@ -1,15 +1,13 @@
-import React from 'react'
+import React from "react";
 
 export interface Props {
-    user: any
+  user: any;
 }
 
 export default function Header({ user }: Props) {
-    return (
-        <div className='header'>
-            <div className="header__welcome">
-                Welcome {user.name}!
-            </div>
-        </div>
-    )
+  return (
+    <div className="header">
+      <div className="header__welcome">Welcome {user?.name}!</div>
+    </div>
+  );
 }

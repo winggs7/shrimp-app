@@ -2,68 +2,83 @@ import axios from "axios";
 import { Crop, CreateCrop, updateCrop, CropStat } from "../Model/crop";
 import { Stat } from "../Model/stat";
 import { CreateHistory, History } from "../Model/history";
+import { apiAxios } from "..";
 
 export class CropApi {
   static async getAllCropsByPondId(id: string): Promise<Crop[]> {
-    const response = await axios.get("crop/pond/" + id);
+    const response = await apiAxios.get("crop/pond/" + id);
     return response.data;
   }
 
   static async getCropById(id: string): Promise<Crop | void> {
-    const response = await axios.get("crop/" + id);
+    const response = await apiAxios.get("crop/" + id);
     return response.data;
   }
 
   static async getStatCrop(id: string): Promise<CropStat[]> {
-    const response = await axios.get("crop/stat/" + id);
+    const response = await apiAxios.get("crop/stat/" + id);
     return response.data;
   }
 
-  static async createCrop(payload: CreateCrop): Promise<Crop | void> {
-    const response = await axios.post("crop/", payload);
+  static async createCrop(payload: CreateCrop): Promise<string> {
+    const response = await apiAxios.post("crop/", payload);
     return response.data;
   }
 
   static async deleteCrop(id: string): Promise<boolean | void> {
-    const response = await axios.delete("crop/" + id);
+    const response = await apiAxios.delete("crop/" + id);
     return response.data;
   }
 
   static async updateCrop(payload: updateCrop): Promise<boolean | void> {
     const { id, ...data } = payload;
-    const response = await axios.put("crop/" + id, data);
+    const response = await apiAxios.put("crop/" + id, data);
     return response.data;
   }
 
   static async createStatCrop(payload: {
     id: string;
-    statIds: string;
+    lstStats: string;
+    lstActive: string;
   }): Promise<boolean | void> {
-    const response = await axios.post("crop/stat/" + payload.id, {
-      statIds: payload.statIds,
+    const response = await apiAxios.post("crop/stat/" + payload.id, {
+      lstStats: payload.lstStats,
+      lstActive: payload.lstActive,
+    });
+    return response.data;
+  }
+
+  static async updateStatCrop(payload: {
+    id: string;
+    statId: string;
+    isActive: number;
+  }): Promise<boolean | void> {
+    const response = await apiAxios.put("crop/stat/" + payload.id, {
+      statId: payload.statId,
+      isActive: payload.isActive,
     });
     return response.data;
   }
 
   static async getCropHistory(id: string): Promise<History[]> {
-    const response = await axios.get("crop/history/all/" + id);
+    const response = await apiAxios.get("crop/history/all/" + id);
     return response.data;
   }
 
   static async getCropHistoryById(id: string): Promise<History | void> {
-    const response = await axios.get("crop/history/" + id);
+    const response = await apiAxios.get("crop/history/" + id);
     return response.data;
   }
 
   static async createCropHistory(
     payload: CreateHistory
   ): Promise<boolean | void> {
-    const response = await axios.post("crop/history", payload);
+    const response = await apiAxios.post("crop/history", payload);
     return response.data;
   }
 
   static async deleteCropHistory(id: string): Promise<boolean | void> {
-    const response = await axios.delete("crop/history/" + id);
+    const response = await apiAxios.delete("crop/history/" + id);
     return response.data;
   }
 }

@@ -17,7 +17,7 @@ export interface Props {
 }
 
 export default function StatComponent({ statId, crop }: Props) {
-  const [stat, setStat] = useState<Stat>();
+  const [stat, setStat] = useState<Stat[]>();
   const [labels, setLabels] = useState<any[]>([]);
   const [datas, setDatas] = useState<number[]>([]);
   const [borderColor, setBorderColor] = useState<string[]>([]);
@@ -27,9 +27,10 @@ export default function StatComponent({ statId, crop }: Props) {
 
   useEffect(() => {
     StatApi.getStatById(statId).then((data) => {
-      setStat(data[0]);
+      data.length && setStat(data);
     });
   }, [statId]);
+
   useEffect(() => {
     const intervalPH = setInterval(() => {
       if (Array.isArray(stat) && stat.length > 0) {
@@ -71,8 +72,8 @@ export default function StatComponent({ statId, crop }: Props) {
   }, [datas, labels, borderColor, stat, period]);
 
   useEffect(() => {
-    const min = stat?.from_stat;
-    const max = stat?.to_stat;
+    const min = stat?.length && stat[0]?.from_stat;
+    const max = stat?.length && stat[0]?.to_stat;
     let description = "";
     if (min && max) {
       if (currentStat < min) {
@@ -127,7 +128,7 @@ export default function StatComponent({ statId, crop }: Props) {
         title: {
           color: "black",
           display: true,
-          text: stat?.name,
+          text: stat?.length && stat[0]?.name,
           font: {
             size: 16,
           },
@@ -139,7 +140,7 @@ export default function StatComponent({ statId, crop }: Props) {
   return (
     <div className="stat-container">
       <div className="stat__name">
-        {stat?.name}: Current: {datas[datas.length - 1]}
+        {stat?.length && stat[0]?.name}: Current: {datas[datas.length - 1]}
       </div>
       <div className="periodField">
         <div className="shrimpInput">

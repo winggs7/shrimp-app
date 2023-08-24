@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import CropItem from "./CropItem";
 import ShrimpButton from "./ShrimpButton";
 import CropDetail from "./CropDetail";
 import { Crop } from "../../Model/crop";
 import AddCrop from "../form/AddCrop";
-import { useNavigate } from "react-router-dom";
+import { CropApi } from "../../Apis/crop.api";
 
 export interface Props {
-  pondId?: string;
-  crops?: Crop[];
+  pondId: string;
 }
 
-export default function CropComponent({ pondId, crops }: Props) {
-  const navigate = useNavigate();
+export default function CropComponent({ pondId }: Props) {
+  const [crops, setCrops] = useState<Crop[]>();
   const [isOpenForm, setIsOpenForm] = useState<boolean>(false);
   const [crop, setCrop] = useState<Crop>();
+
+  useEffect(() => {
+    CropApi.getAllCropsByPondId(pondId).then((data) => {
+      setCrops(data);
+    });
+  }, [isOpenForm]);
+
   return (
     <>
       {crop ? (

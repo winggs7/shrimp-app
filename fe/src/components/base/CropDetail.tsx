@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import StatComponent from "./StatComponent";
 import CropInfo from "./CropInfo";
 import ShrimpButton from "./ShrimpButton";
-import { Crop, CropStat } from "../../Model/crop";
+import { Crop } from "../../Model/crop";
 import { CropApi } from "../../Apis/crop.api";
 import { Stat } from "../../Model/stat";
 import { StatApi } from "../../Apis/stat.api";
@@ -21,11 +20,13 @@ export default function CropDetail({ crop }: Props) {
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
 
   useEffect(() => {
-    CropApi.getStatCrop(crop.id).then((data) => {
-      if (data.length > 0) {
-        setStatIds(data?.map((s) => s.statId));
-      }
-    });
+    if (!isOpenForm) {
+      setStatCrop();
+    }
+  }, [isOpenForm]);
+
+  useEffect(() => {
+    setStatCrop();
     StatApi.getAllStats().then((data) => {
       setStats(data);
     });
@@ -40,6 +41,15 @@ export default function CropDetail({ crop }: Props) {
       }
     });
   }, []);
+
+  const setStatCrop = () => {
+    CropApi.getStatCrop(crop.id).then((data) => {
+      if (data.length > 0) {
+        const datas = data?.filter((s) => s.isActive === 1);
+        setStatIds(datas.map((d) => d.statId));
+      }
+    });
+  };
 
   return (
     <>

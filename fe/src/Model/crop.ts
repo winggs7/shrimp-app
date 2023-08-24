@@ -19,4 +19,5 @@ export interface updateCrop extends CreateCrop {
 export interface CropStat {
   cropId: string;
   statId: string;
+  isActive: number;
 }

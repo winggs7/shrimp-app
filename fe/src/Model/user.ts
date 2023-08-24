@@ -1,5 +1,12 @@
 export interface User {
   name: string;
-  password: string;
-  refreshToken: string;
+  password?: string;
+  access_token: string;
+  refresh_token: string;
+}
+
+export interface JwtPayload {
+  user: string;
+  exp: number;
+  iat: number;
 }

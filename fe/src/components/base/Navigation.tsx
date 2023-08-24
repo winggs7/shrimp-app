@@ -4,6 +4,7 @@ import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import MenuItem from "./MenuItem";
 import { MENU } from "../../App";
 import { useNavigate } from "react-router-dom";
+import { AuthApi } from "../../Apis/auth.api";
 
 export interface Props {
   onChangeNav: Function;
@@ -42,7 +43,12 @@ export default function Navigation({ onChangeNav, menuItem, onLogout }: Props) {
         onClick={() => navigate("/setting")}
         isActive={menuItem === MENU.SETTING}
       />
-      <button className="logout-btn" onClick={() => onLogout()}>
+      <button
+        className="logout-btn"
+        onClick={async () => {
+          onLogout();
+        }}
+      >
         Logout
       </button>
     </div>

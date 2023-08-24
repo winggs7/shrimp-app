@@ -155,29 +155,50 @@ router.put("/:id", async (req, res) => {
 router.post("/stat/:id", async (req, res) => {
   try {
     let id = req.params.id;
-    let statIds = req.body.statIds;
+    let lstStats = req.body.lstStats;
+    let lstActive = req.body.lstActive;
 
-    const stats = statIds.split(",");
+    const stats = lstStats.split(",");
+    const active = lstActive.split(",");
     let sqlOptions = "";
     const statsObj = [];
 
     if (Array.isArray(stats)) {
       stats.map((stat, index) => {
         if (stats.length - 1 === index) {
-          sqlOptions += "(?,?)";
+          sqlOptions += "(?,?,?)";
         } else {
-          sqlOptions += "(?,?), ";
+          sqlOptions += "(?,?,?), ";
         }
         statsObj.push(id);
         statsObj.push(stat);
+        statsObj.push(active[index]);
       });
     }
-
-    let sql = `INSERT INTO CROP_STAT (cropID, statID) VALUES {0};`;
+    let sql = `INSERT INTO CROP_STAT (cropID, statID, isActive) VALUES {0}`;
     let newSql = sql.replace("{0}", sqlOptions);
 
     id &&
       connection.query(newSql, statsObj, (err, results) => {
+        if (err) res.status(500).json(err);
+        res.status(200).json(results);
+      });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+//Update stats to track for a crop
+router.put("/stat/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let statId = req.body.statId;
+    let isActive = req.body.isActive;
+
+    let sql = `UPDATE CROP_STAT SET isActive = ? WHERE cropID = ? AND statID = ?;`;
+
+    id &&
+      connection.query(sql, [isActive, id, statId], (err, results) => {
         if (err) res.status(500).json(err);
         res.status(200).json(results);
       });

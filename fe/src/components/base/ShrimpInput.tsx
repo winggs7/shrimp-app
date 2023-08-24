@@ -13,7 +13,6 @@ export default function ShrimpInput({ title, require, value, onInput }: Props) {
       {title && <div className="input__title">{title}</div>}
       <input
         type="text"
-        // required={require}
         value={value}
         onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
           onInput(e.target.value)

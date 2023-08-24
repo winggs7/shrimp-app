@@ -5,6 +5,7 @@ import Home from "../../components/pages/Home";
 import Manage from "../../components/pages/Manage";
 import Setting from "../../components/pages/Setting";
 import { MENU } from "../../App";
+import { AuthApi } from "../../Apis/auth.api";
 
 export interface Props {
   user: any;
@@ -57,26 +58,9 @@ export default function HomeContainer({ user, onSetUser, navigate }: Props) {
   //   setForm("");
   // };
 
-  // const onOpenWarningDelete = (action?: string, id?: string) => {
-  //   setWarning({ action, id });
-  //   setForm("delete");
-  // };
-
-  // const renderWarning = () => {
-  //   if (form === FORM.DELETE) {
-  //     return <WarningBox onDeleteValue={onDeleteValue} info={warning} />;
-  //   } else if (form === FORM.NONE) {
-  //     return "";
-  //   }
-  // };
-
   const onLogout = async () => {
     try {
-      // const response = await axios.post("http://localhost:7000/user/logout", {
-      //     username: user.name
-      // })
-      // response && onSetUser(null);
-      localStorage.clear();
+      await AuthApi.logout();
       onSetUser(null);
     } catch (error) {
       console.log("error");
