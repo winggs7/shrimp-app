@@ -1,9 +1,9 @@
 import axios from "axios";
 import { Stat } from "../Model/stat";
-import { apiAxios } from "..";
+import { apiAxios } from "../utils/axios";
 
 export class StatApi {
-  static async updateStat(payload: Stat): Promise<Stat | void> {
+  static async updateStat(payload: Stat): Promise<Stat> {
     const response = await apiAxios.put("stat/", payload);
     return response.data;
   }

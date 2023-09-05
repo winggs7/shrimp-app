@@ -10,9 +10,32 @@ router.get("/pond/:pondID", async (req, res) => {
     let pondID = req.params.pondID;
     let sql = "SELECT * FROM CROP WHERE CROP.pondID = ?;";
     connection.query(sql, pondID, (err, results) => {
-      if (err) res.status(500).json(err);
+      if (err) {
+        res.status(500).json(err);
+      } else {
+        res.status(200).json(results);
+      }
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
-      res.status(200).json(results);
+//Get all crops are tracking by stat
+router.get("/tracking/:userName", async (req, res) => {
+  try {
+    let name = req.params.userName;
+    let statID = req.query.statID;
+    let sql =
+      "SELECT cropId as id FROM CROP_STAT WHERE isActive = TRUE AND statId = ? AND cropId IN (" +
+      "SELECT crop.id FROM CROP JOIN POND ON CROP.pondId = POND.id JOIN USER ON POND.userName = USER.name " +
+      "WHERE USER.name = ? );";
+    connection.query(sql, [statID, name], (err, results) => {
+      if (err) {
+        res.status(500).json(err);
+      } else {
+        res.status(200).json(results);
+      }
     });
   } catch (error) {
     res.status(500).json(error);
@@ -28,11 +51,13 @@ router.get("/:id", async (req, res) => {
 
     id &&
       connection.query(sql, id, (err, results) => {
-        if (err) res.status(500).json(err);
-
-        results.length > 0
-          ? res.status(200).json(results)
-          : res.status(200).json("Cant find any crop!");
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          results.length > 0
+            ? res.status(200).json(results)
+            : res.status(200).json("Cant find any crop!");
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -48,11 +73,13 @@ router.get("/stat/:id", async (req, res) => {
 
     cropID &&
       connection.query(sql, cropID, (err, results) => {
-        if (err) res.status(500).json(err);
-
-        results.length > 0
-          ? res.status(200).json(results)
-          : res.status(200).json("");
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          results.length > 0
+            ? res.status(200).json(results)
+            : res.status(200).json("");
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -77,13 +104,18 @@ router.post("/", async (req, res) => {
         sql,
         [id, pondID, type, number, date],
         (err, results) => {
-          if (err) res.status(500).json(err);
-          res.status(200).json(id);
+          if (err) {
+            res
+              .status(400)
+              .json("Cannot create a crop! Check data again, please!");
+          } else {
+            res.status(200).json(id);
+          }
         }
       );
     }
   } catch (error) {
-    res.status(500).json(error);
+    res.status(400).json(error);
   }
 });
 
@@ -111,8 +143,11 @@ router.delete("/:id", async (req, res) => {
 
     id &&
       connection.query(sql, [id, id, id, id], (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot delete this crop!");
+        } else {
+          res.status(200).json(results);
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -142,8 +177,11 @@ router.put("/:id", async (req, res) => {
 
     if (type || number) {
       connection.query(sql, id, (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot update this crop!");
+        } else {
+          res.status(200).json(results);
+        }
       });
     }
   } catch (error) {
@@ -180,8 +218,11 @@ router.post("/stat/:id", async (req, res) => {
 
     id &&
       connection.query(newSql, statsObj, (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot update this stat for crop!");
+        } else {
+          res.status(200).json(results);
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -199,8 +240,11 @@ router.put("/stat/:id", async (req, res) => {
 
     id &&
       connection.query(sql, [isActive, id, statId], (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot update this stat for crop!");
+        } else {
+          res.status(200).json(results);
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -233,8 +277,11 @@ router.delete("/stat/:id", async (req, res) => {
 
     id &&
       connection.query(newSql, statsObj, (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot delete this stat!");
+        } else {
+          res.status(200).json(results);
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -251,11 +298,13 @@ router.get("/history/all/:id", async (req, res) => {
 
     cropID &&
       connection.query(sql, cropID, (err, results) => {
-        if (err) res.status(500).json(err);
-
-        results.length > 0
-          ? res.status(200).json(results)
-          : res.status(200).json("");
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          results.length > 0
+            ? res.status(200).json(results)
+            : res.status(200).json("");
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -271,11 +320,13 @@ router.get("/history/:id", async (req, res) => {
 
     id &&
       connection.query(sql, id, (err, results) => {
-        if (err) res.status(500).json(err);
-
-        results.length > 0
-          ? res.status(200).json(results)
-          : res.status(200).json("Cant find any history!");
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          results.length > 0
+            ? res.status(200).json(results)
+            : res.status(200).json("Cant find any history!");
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -302,8 +353,11 @@ router.post("/history", async (req, res) => {
         sql,
         [id, cropId, statId, date, num_stat, isDanger, description],
         (err, results) => {
-          if (err) res.status(500).json(err);
-          res.status(200).json(results);
+          if (err) {
+            res.status(400).json("Cannot save a history!");
+          } else {
+            res.status(200).json(results);
+          }
         }
       );
     }
@@ -321,8 +375,11 @@ router.delete("/history/:id", async (req, res) => {
 
     id &&
       connection.query(sql, id, (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot delete this history!");
+        } else {
+          res.status(200).json(results);
+        }
       });
   } catch (error) {
     res.status(500).json(error);

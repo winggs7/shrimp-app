@@ -2,11 +2,21 @@ import axios from "axios";
 import { Crop, CreateCrop, updateCrop, CropStat } from "../Model/crop";
 import { Stat } from "../Model/stat";
 import { CreateHistory, History } from "../Model/history";
-import { apiAxios } from "..";
+import { apiAxios } from "../utils/axios";
 
 export class CropApi {
   static async getAllCropsByPondId(id: string): Promise<Crop[]> {
     const response = await apiAxios.get("crop/pond/" + id);
+    return response.data;
+  }
+
+  static async getAllTrackingCropsByPondId(
+    userName: string,
+    statID: number
+  ): Promise<Crop[]> {
+    const response = await apiAxios.get(
+      `crop/tracking/${userName}?statID=${statID}`
+    );
     return response.data;
   }
 

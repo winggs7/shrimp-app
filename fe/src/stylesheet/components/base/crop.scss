@@ -8,6 +8,10 @@
         margin-bottom: 10px;
         color: #256D85;
         border-bottom: 1px solid #256D85;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .crop-list {

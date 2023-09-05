@@ -5,29 +5,80 @@ import CropDetail from "./CropDetail";
 import { Crop } from "../../Model/crop";
 import AddCrop from "../form/AddCrop";
 import { CropApi } from "../../Apis/crop.api";
+import WarningBox from "./WarningBox";
+import { useNavigate } from "react-router-dom";
+import { PondApi } from "../../Apis/pond.api";
+import { AlertPopupModel } from "../../Model/alert";
+import AlertPopup from "./AlertPopup";
 
 export interface Props {
   pondId: string;
 }
 
 export default function CropComponent({ pondId }: Props) {
+  const navigate = useNavigate();
+
   const [crops, setCrops] = useState<Crop[]>();
   const [isOpenForm, setIsOpenForm] = useState<boolean>(false);
-  const [crop, setCrop] = useState<Crop>();
+  const [crop, setCrop] = useState<Crop | null>();
+  const [warning, setWarning] = useState<boolean>(false);
+  const [alert, setAlert] = useState<AlertPopupModel | null>();
 
   useEffect(() => {
     CropApi.getAllCropsByPondId(pondId).then((data) => {
       setCrops(data);
     });
+    if (isOpenForm) {
+      setAlert(null);
+    }
   }, [isOpenForm]);
+
+  useEffect(() => {
+    CropApi.getAllCropsByPondId(pondId).then((data) => {
+      setCrops(data);
+    });
+  }, [crop]);
+
+  const openWarning = () => {
+    return (
+      <WarningBox
+        isOpen={warning}
+        onClick={() => onDeletePond()}
+        onCancel={() => setWarning(false)}
+      />
+    );
+  };
+
+  const onDeletePond = async () => {
+    setAlert(null);
+    if (pondId) {
+      await PondApi.deletePond(pondId)
+        .then(() => {
+          navigate("/");
+        })
+        .catch((errorMessage) => {
+          setAlert({
+            type: "danger",
+            title: errorMessage,
+          });
+        });
+    }
+  };
 
   return (
     <>
       {crop ? (
-        <CropDetail crop={crop} />
+        <CropDetail crop={crop} pondId={pondId} setCrop={setCrop} />
       ) : (
         <div className="crop-container">
-          <div className="title">Crop list</div>
+          <div className="title">
+            Crop list
+            <ShrimpButton
+              title={"Delete pond"}
+              type="error"
+              onClick={() => setWarning(true)}
+            />
+          </div>
           <ShrimpButton
             title={"add crop"}
             onClick={() => setIsOpenForm(true)}
@@ -41,8 +92,15 @@ export default function CropComponent({ pondId }: Props) {
         </div>
       )}
       {isOpenForm && (
-        <AddCrop pondId={pondId} open={isOpenForm} setOpen={setIsOpenForm} />
+        <AddCrop
+          pondId={pondId}
+          open={isOpenForm}
+          setOpen={setIsOpenForm}
+          setAlertPopup={setAlert}
+        />
       )}
+      {openWarning()}
+      {alert && <AlertPopup title={alert.title} type={alert.type} />}
     </>
   );
 }

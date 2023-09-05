@@ -1,6 +1,6 @@
 import axios from "axios";
 import { User } from "../Model/user";
-import { apiAxios } from "..";
+import { apiAxios } from "../utils/axios";
 
 export class AuthApi {
   static async login(email: string, password: string): Promise<User> {
@@ -9,12 +9,14 @@ export class AuthApi {
   }
 
   static async register(email: string, password: string): Promise<User> {
-    const response = await apiAxios.post("/register", { email, password });
+    const response = await apiAxios.post("/user/register", { email, password });
     return response.data;
   }
 
   static async refreshToken(refreshToken: string): Promise<string> {
-    const response = await apiAxios.post("/refreshToken", { refreshToken });
+    const response = await apiAxios.post("/user/refreshToken", {
+      refreshToken,
+    });
     return response.data;
   }
 

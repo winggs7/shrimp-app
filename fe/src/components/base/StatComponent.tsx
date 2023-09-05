@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { ChartData, ScatterDataPoint } from "chart.js";
 import LineChart from "./LineChart";
 import moment from "moment";
-import { randomData } from "../../utils/common-helper";
-import axios from "axios";
 import { CropApi } from "../../Apis/crop.api";
 import { CreateHistory } from "../../Model/history";
 import { StatApi } from "../../Apis/stat.api";
 import { Stat } from "../../Model/stat";
 import { Crop } from "../../Model/crop";
 import ShrimpButton from "./ShrimpButton";
+import socket from "../../utils/socket";
+import { randomData } from "../../utils/common-helper";
 
 export interface Props {
   statId: string;
@@ -24,6 +24,14 @@ export default function StatComponent({ statId, crop }: Props) {
   const [currentStat, setCurrentStat] = useState<number>(0.0);
   const [period, setPeriod] = useState<number>(3000);
   const [checkPeriod, setCheckPeriod] = useState<number>(3000);
+  const [ports, setPorts] = useState<any>();
+
+  useEffect(() => {
+    socket.emit("get_port_list");
+    socket.on("port_list", (data) => {
+      setPorts(data);
+    });
+  }, []);
 
   useEffect(() => {
     StatApi.getStatById(statId).then((data) => {
@@ -31,9 +39,49 @@ export default function StatComponent({ statId, crop }: Props) {
     });
   }, [statId]);
 
+  // useEffect(() => {
+  //   const intervalPH = setInterval(() => {
+  //     if (Array.isArray(stat) && stat.length > 0) {
+  //       const chartData: number[] = [...datas];
+  //       const timeData: any[] = [...labels];
+  //       const colorData: string[] = [...borderColor];
+
+  //       if (chartData.length > 8) {
+  //         chartData.shift();
+  //         timeData.shift();
+  //         colorData.shift();
+  //       }
+  //       var time = moment().format("LT");
+  //       var datapH: number = parseFloat(
+  //         randomData(stat[0].from_stat - 2, stat[0].to_stat + 2, currentStat)
+  //       );
+  //       setCurrentStat(datapH);
+
+  //       if (datapH < stat[0].from_stat || datapH > stat[0].to_stat) {
+  //         colorData.push("#FF0000");
+  //       } else {
+  //         colorData.push("#1BFF00");
+  //       }
+  //       setBorderColor(colorData);
+
+  //       chartData.push(datapH);
+  //       setDatas(chartData);
+
+  //       timeData.push(time);
+  //       setLabels(timeData);
+  //     } else {
+  //       clearInterval(intervalPH);
+  //     }
+  //   }, period);
+
+  //   return () => {
+  //     clearInterval(intervalPH);
+  //   };
+  // }, [datas, labels, borderColor, stat, period]);
+
   useEffect(() => {
-    const intervalPH = setInterval(() => {
-      if (Array.isArray(stat) && stat.length > 0) {
+    if (Array.isArray(stat) && stat.length) {
+      socket.on(`${stat[0].name}_${crop?.id}`, (data) => {
         const chartData: number[] = [...datas];
         const timeData: any[] = [...labels];
         const colorData: string[] = [...borderColor];
@@ -44,9 +92,8 @@ export default function StatComponent({ statId, crop }: Props) {
           colorData.shift();
         }
         var time = moment().format("LT");
-        var datapH: number = parseFloat(
-          randomData(stat[0].from_stat - 2, stat[0].to_stat + 2, currentStat)
-        );
+        var datapH: number = data;
+        console.log(data);
         setCurrentStat(datapH);
 
         if (datapH < stat[0].from_stat || datapH > stat[0].to_stat) {
@@ -61,14 +108,8 @@ export default function StatComponent({ statId, crop }: Props) {
 
         timeData.push(time);
         setLabels(timeData);
-      } else {
-        clearInterval(intervalPH);
-      }
-    }, period);
-
-    return () => {
-      clearInterval(intervalPH);
-    };
+      });
+    }
   }, [datas, labels, borderColor, stat, period]);
 
   useEffect(() => {
@@ -142,6 +183,14 @@ export default function StatComponent({ statId, crop }: Props) {
       <div className="stat__name">
         {stat?.length && stat[0]?.name}: Current: {datas[datas.length - 1]}
       </div>
+      <span>
+        Using:{" "}
+        {ports?.length && Array.isArray(ports)
+          ? ports[0].path
+          : "Dont connected any serial path"}
+      </span>
+      <br />
+      <br />
       <div className="periodField">
         <div className="shrimpInput">
           <div className="input__title">Period (s):</div>

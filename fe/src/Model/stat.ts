@@ -1,6 +1,7 @@
 export interface Stat {
-  id: string;
+  id: number;
   name?: string;
   from_stat: number;
   to_stat: number;
+  userName?: string;
 }

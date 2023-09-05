@@ -13,9 +13,11 @@ router.get("/:username", async (req, res) => {
     sql &&
       username &&
       connection.query(sql, username, (err, results) => {
-        if (err) res.status(500).json(err);
-
-        results && res.status(200).json(results);
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          results && res.status(200).json(results);
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -31,11 +33,13 @@ router.get("/p/:id", async (req, res) => {
 
     id &&
       connection.query(sql, id, (err, results) => {
-        if (err) res.status(500).json(err);
-
-        results.length > 0
-          ? res.status(200).json(results)
-          : res.status(200).json("Cant find any pond!");
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          results.length > 0
+            ? res.status(200).json(results)
+            : res.status(200).json("Cant find any pond!");
+        }
       });
   } catch (error) {
     res.status(500).json(error);
@@ -61,8 +65,13 @@ router.post("/", async (req, res) => {
         sql,
         [id, username, name, area, deep, date],
         (err, results) => {
-          if (err) res.status(500).json(err);
-          res.status(200).json(results);
+          if (err) {
+            res
+              .status(400)
+              .json("Cannot create a pond! Check data again, please!");
+          } else {
+            res.status(200).json(results);
+          }
         }
       );
     }
@@ -96,8 +105,11 @@ router.put("/:id", async (req, res) => {
 
     if (name || area || deep) {
       connection.query(sql, id, (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot update this pond!");
+        } else {
+          res.status(200).json(results);
+        }
       });
     }
   } catch (error) {
@@ -133,8 +145,11 @@ router.delete("/:id", async (req, res) => {
 
     id &&
       connection.query(sql, [id, id, id, id], (err, results) => {
-        if (err) res.status(500).json(err);
-        res.status(200).json(results);
+        if (err) {
+          res.status(400).json("Cannot delete this pond!");
+        } else {
+          res.status(200).json(results);
+        }
       });
   } catch (error) {
     res.status(500).json(error);

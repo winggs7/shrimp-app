@@ -11,12 +11,14 @@
     cursor: pointer;
 
     &.error {
+        background-color: rgb(255, 54, 54);
         border: solid 1px rgb(255, 54, 54);
-        color: rgb(255, 54, 54);
+        color: white;
 
         &:hover {
-            background-color: rgb(255, 54, 54);
-            color: white;
+            background-color: white;
+            border: solid 1px rgb(255, 54, 54);
+            color: rgb(255, 54, 54);
         }
     }
 

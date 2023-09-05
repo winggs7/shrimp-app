@@ -1,6 +1,6 @@
 import axios from "axios";
 import { CreatePond, Pond, UpdatePond } from "../Model/pond";
-import { apiAxios } from "..";
+import { apiAxios } from "../utils/axios";
 
 export class PondApi {
   static async getPondsByUser(username: string): Promise<Pond[]> {

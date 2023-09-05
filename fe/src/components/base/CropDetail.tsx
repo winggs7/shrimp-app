@@ -8,16 +8,26 @@ import { Stat } from "../../Model/stat";
 import { StatApi } from "../../Apis/stat.api";
 import AssignStats from "../form/AssignStats";
 import ShowHistory from "../form/ShowHistory";
+import WarningBox from "./WarningBox";
+import { useNavigate } from "react-router-dom";
+import { AlertPopupModel } from "../../Model/alert";
+import AlertPopup from "./AlertPopup";
 
 export interface Props {
   crop: Crop;
+  pondId: string;
+  setCrop: any;
 }
 
-export default function CropDetail({ crop }: Props) {
+export default function CropDetail({ crop, pondId, setCrop }: Props) {
+  const navigate = useNavigate();
+
   const [statIds, setStatIds] = useState<string[]>();
   const [stats, setStats] = useState<Stat[]>();
   const [isOpenForm, setIsOpenForm] = useState<boolean>(false);
   const [isOpenHistory, setIsOpenHistory] = useState<boolean>(false);
+  const [warning, setWarning] = useState<boolean>(false);
+  const [alert, setAlert] = useState<AlertPopupModel | null>();
 
   useEffect(() => {
     if (!isOpenForm) {
@@ -35,9 +45,11 @@ export default function CropDetail({ crop }: Props) {
   useEffect(() => {
     CropApi.getCropHistory(crop?.id).then((data) => {
       if (data.length > 0) {
-        alert(
-          "Please check your histories! There are some problem with your pond!"
-        );
+        setAlert({
+          type: "danger",
+          title:
+            "Please check your histories! There are some problem with your crop!",
+        });
       }
     });
   }, []);
@@ -51,6 +63,32 @@ export default function CropDetail({ crop }: Props) {
     });
   };
 
+  const openWarning = () => {
+    return (
+      <WarningBox
+        isOpen={warning}
+        onClick={() => onDeleteCrop()}
+        onCancel={() => setWarning(false)}
+      />
+    );
+  };
+
+  const onDeleteCrop = async () => {
+    if (crop) {
+      await CropApi.deleteCrop(crop?.id)
+        .then(() => {
+          setCrop(null);
+          navigate("/crop/" + pondId);
+        })
+        .catch((errorMessage) => {
+          setAlert({
+            type: "danger",
+            title: errorMessage,
+          });
+        });
+    }
+  };
+
   return (
     <>
       <CropInfo crop={crop} />
@@ -62,6 +100,11 @@ export default function CropDetail({ crop }: Props) {
         <ShrimpButton
           title={"View histories"}
           onClick={() => setIsOpenHistory(true)}
+        />
+        <ShrimpButton
+          title={"Delete crop"}
+          type="error"
+          onClick={() => setWarning(true)}
         />
       </div>
       {statIds &&
@@ -82,6 +125,8 @@ export default function CropDetail({ crop }: Props) {
           setOpen={setIsOpenHistory}
         />
       )}
+      {openWarning()}
+      {alert && <AlertPopup title={alert.title} type={alert.type} />}
     </>
   );
 }

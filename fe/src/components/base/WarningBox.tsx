@@ -1,20 +1,30 @@
-import React from 'react'
+import React from "react";
+import ShrimpButton from "./ShrimpButton";
 
 export interface Props {
-    info: any,
-    onDeleteValue: Function
+  isOpen?: boolean;
+  onClick: any;
+  onCancel: any;
 }
 
-export default function WarningBox({ info, onDeleteValue }: Props) {
-    return (
-        <div className="warning-box">
-            <div className="content">
-                Are you sure to delete this item(s)?
-                <div className="btn-container">
-                    <button className={'shrimp-button delete'} onClick={() => { onDeleteValue(info.action, info.id) }}>Delete</button>
-                    <button className={'shrimp-button'} onClick={() => { onDeleteValue('cancel') }}>Cancel</button>
-                </div>
-            </div>
+export default function WarningBox({ onClick, isOpen, onCancel }: Props) {
+  return (
+    <div className={`warning-box ${isOpen ? "show" : ""}`}>
+      <div className="content">
+        Are you sure to delete this item(s)?
+        <div className="btn-container">
+          <ShrimpButton
+            title={"Accept"}
+            type="error"
+            onClick={onClick}
+          ></ShrimpButton>
+          <ShrimpButton
+            title={"Cancel"}
+            type="cancel"
+            onClick={onCancel}
+          ></ShrimpButton>
         </div>
-    )
+      </div>
+    </div>
+  );
 }

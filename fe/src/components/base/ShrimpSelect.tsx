@@ -3,7 +3,7 @@ import React from "react";
 export interface Props {
   items?: any;
   value?: string;
-  onChange: Function;
+  onChange: any;
   title?: string;
 }
 
@@ -11,13 +11,12 @@ export default function ShrimpSelect({ value, onChange, title, items }: Props) {
   return (
     <div className="shrimpSelect">
       {title && <>Pick your favorite flavor:</>}
-      <select value={value} onChange={() => onChange}>
+      <select value={value} onChange={(e) => onChange(e)}>
         {items?.map((item: any) => {
           return (
-            <>
-              <option value={item?.key}>{item?.name}</option>
-              <option value={item?.key}>{item?.name}</option>
-            </>
+            <option key={item?.id} value={item?.id}>
+              {item?.name}
+            </option>
           );
         })}
       </select>

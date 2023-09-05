@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PondComponent from "../base/PondComponent";
 import InformationBar from "../base/InformationBar";
 import ShrimpButton from "../base/ShrimpButton";
 import Weather from "../base/Weather";
 import AddPond from "../form/AddPond";
+import { AlertPopupModel } from "../../Model/alert";
+import AlertPopup from "../base/AlertPopup";
 
 export interface Props {
   user: any;
@@ -12,6 +14,13 @@ export interface Props {
 
 export default function Home({ onChangeNav, user }: Props) {
   const [isOpenForm, setIsOpenForm] = useState<boolean>(false);
+  const [alert, setAlert] = useState<AlertPopupModel | null>();
+
+  useEffect(() => {
+    if (isOpenForm) {
+      setAlert(null);
+    }
+  }, [isOpenForm]);
 
   return (
     <>
@@ -32,8 +41,10 @@ export default function Home({ onChangeNav, user }: Props) {
           userName={user?.name}
           open={isOpenForm}
           setOpen={setIsOpenForm}
+          setAlertPopup={setAlert}
         />
       )}
+      {alert && <AlertPopup title={alert.title} type={alert.type} />}
     </>
   );
 }

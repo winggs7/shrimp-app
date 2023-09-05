@@ -1,13 +1,17 @@
 .warning-box {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     background: rgba(0, 0, 0, 0.3);
     width: 100%;
     height: 100vh;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
+
+    &.show {
+        display: flex;
+    }
 
     .content {
         background-color: white;
@@ -23,6 +27,7 @@
     .btn-container {
         margin-top: 10px;
         font-size: 1rem;
+        display: flex;
 
         .shrimp-button {
             cursor: pointer;

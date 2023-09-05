@@ -6,7 +6,11 @@ import { PondApi } from "../../Apis/pond.api";
 import { Pond } from "../../Model/pond";
 import CropComponent from "../base/CropComponent";
 
-export default function Manage() {
+export interface Props {
+  user: any;
+}
+
+export default function Manage({ user }: Props) {
   let location = useLocation();
   const [pond, setPond] = useState<Pond>();
 
@@ -33,7 +37,7 @@ export default function Manage() {
         )}
       </div>
       <div className="right-side">
-        <InformationBar />
+        <InformationBar user={user} />
         <Weather />
       </div>
     </>

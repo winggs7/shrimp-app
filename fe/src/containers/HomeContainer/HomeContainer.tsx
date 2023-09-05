@@ -16,6 +16,7 @@ export interface Props {
 export interface FORM {
   open?: any;
   setOpen?: any;
+  setAlertPopup?: any;
 }
 
 export default function HomeContainer({ user, onSetUser, navigate }: Props) {
@@ -29,42 +30,14 @@ export default function HomeContainer({ user, onSetUser, navigate }: Props) {
     setMenuItem(nav);
   };
 
-  // const onDeleteValue = async (action?: string, id?: string) => {
-  //   if (action === "deletePond") {
-  //     try {
-  //       await axios.delete("http://localhost:7000/pond/" + id);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //     setMenuItem("home");
-  //   } else if (action === "deleteCrop") {
-  //     try {
-  //       await axios.delete("http://localhost:7000/crop/" + id);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //     setCropID("");
-  //     onChangeNav(MENU.MANAGE, pondID);
-  //   } else if (action === "deleteHistory") {
-  //     try {
-  //       await axios.delete("http://localhost:7000/crop/history/" + id);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   if (action === "cancel") {
-  //     setWarning({ action: "", id: "" });
-  //   }
-  //   setForm("");
-  // };
-
   const onLogout = async () => {
-    try {
-      await AuthApi.logout();
-      onSetUser(null);
-    } catch (error) {
-      console.log("error");
-    }
+    AuthApi.logout()
+      .then(() => {
+        onSetUser(null);
+      })
+      .catch((e) => {
+        console.log("error");
+      });
   };
 
   return (
@@ -81,8 +54,8 @@ export default function HomeContainer({ user, onSetUser, navigate }: Props) {
           {menuItem === MENU.HOME && (
             <Home user={user} onChangeNav={onChangeNav} />
           )}
-          {menuItem === MENU.MANAGE && <Manage />}
-          {menuItem === MENU.SETTING && <Setting />}
+          {menuItem === MENU.MANAGE && <Manage user={user} />}
+          {menuItem === MENU.SETTING && <Setting user={user} />}
         </div>
       </div>
     </div>

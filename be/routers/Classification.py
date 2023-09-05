@@ -1,134 +1,333 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import precision_score, recall_score, classification_report, confusion_matrix
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
+# import sys
+# import pandas as pd
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.model_selection import train_test_split, GridSearchCV
+# from sklearn.metrics import accuracy_score, classification_report
+# from imblearn.over_sampling import SMOTE
+# from sklearn.preprocessing import StandardScaler
 
-# read dataset
-dataframe = pd.read_csv("../data/waterqualitydataset.csv")
-dataframe["Water_Quality"] = dataframe["Water_Quality"].astype("category")
+# # Load the data from the CSV file
+# data = pd.read_csv("../data/Results_MADE.csv")
 
-features = ['Temperature', 'pH', 'Dissolved_Oxygen', 'Nitrate']
-X = dataframe[features]
-y = dataframe['Water_Quality']
+# # Select the relevant columns for classification
+# selected_columns = ['Temperature', 'Dissolved Oxygen', 'pH', 'Nitrate (mg/ L)', 'WQI']
+# df = data[selected_columns].copy()
 
-#training model
-###DecisionTreeClassifier
-def DecisionTreeClassify ():
-    dt_model = DecisionTreeClassifier(random_state=1)
-    dt_model.fit(X_train, y_train)
-    dt_score = dt_model.score(X_valid, y_valid)
-    return dt_score
+# # Remove any rows with missing values
+# df.dropna(inplace=True)
 
-###LogisticRegression
+# # Convert WQI to categorical labels
+# df['WQI_Category'] = pd.cut(df['WQI'], bins=[0, 25, 50, float('inf')], labels=['Poor', 'Moderate', 'Good'])
 
-def LogisticRegressionClassify ():
-    log_reg = LogisticRegression(solver='liblinear', max_iter=1000)
-    log_reg.fit(X_train, y_train)
+# # Separate the features and target variable
+# X = df.drop(['WQI', 'WQI_Category'], axis=1)
+# y = df['WQI_Category']
 
-    log_score = log_reg.score(X_valid, y_valid)
-    return log_score
+# # Perform oversampling to balance the classes
+# oversampler = SMOTE(random_state=42)
+# X_resampled, y_resampled = oversampler.fit_resample(X, y)
 
-# log_y_pred = log_reg.predict(X_valid)
-# poly = PolynomialFeatures(degree=2)
-# poly_features_X_train = poly.fit_transform(X_train)
-# poly_features_X_val = poly.transform(X_valid)
-# poly_log_reg = LogisticRegression(solver='liblinear', max_iter=1000)
-# poly_log_reg.fit(poly_features_X_train, y_train)
+# # Split the resampled data into training and testing sets
+# X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 
-#Cross validation
-def CrossValidationLogReg ():
-    log_reg_cv = LogisticRegression(solver='liblinear', max_iter=1000)
-    dt_cv = DecisionTreeClassifier(criterion = 'entropy', max_depth = 8, random_state=1)
-    lr_scores = cross_val_score(log_reg_cv, X, y, scoring='accuracy', cv=10)
-    print(lr_scores.mean())
-    dt_scores = cross_val_score(dt_cv, X, y, scoring='accuracy', cv=10)
-    print(dt_scores.mean())
+# # Perform feature scaling
+# scaler = StandardScaler()
+# X_train_scaled = scaler.fit_transform(X_train)
+# X_test_scaled = scaler.transform(X_test)
 
+# # Create an instance of the Random Forest Classifier
+# rf_classifier = RandomForestClassifier(random_state=42)
 
-# sns.histplot(data=data, x='pH', hue='Water_Quality', bins = 40, palette='Blues')
-# plt.show()
+# # Perform hyperparameter tuning using GridSearchCV
+# param_grid = {
+#     'n_estimators': [100, 200, 300],
+#     'max_depth': [None, 5, 10],
+#     'min_samples_split': [2, 4, 8],
+#     'min_samples_leaf': [1, 2, 4]
+# }
 
-##Cut pH into 4 category
-# pH_category = ['very_low', 'medium_low', 'medium_high', 'very_high']
-# quartile_pH_data = pd.qcut(X['pH'], 4, labels=pH_category)
-# X.iloc[:, 1] = quartile_pH_data
+# grid_search = GridSearchCV(rf_classifier, param_grid, cv=5)
+# grid_search.fit(X_train_scaled, y_train)
 
-# ##Cut nitrate into 4 category
-# nitrate_category = ['very_low', 'medium_low', 'medium_high', 'very_high']
-# quartile_nitrate_data = pd.qcut(X['Nitrate'], 4, labels=pH_category)
-# X.iloc[:, 3] = quartile_nitrate_data
+# # Fit the classifier to the training data with the best hyperparameters
+# best_rf_classifier = grid_search.best_estimator_
+# best_rf_classifier.fit(X_train_scaled, y_train)
 
-# X.iloc[:, 1] = X["pH"].astype("category")
-# X.iloc[:, 3] = X["Nitrate"].astype("category")
+# # Make predictions on the testing data
+# y_pred = best_rf_classifier.predict(X_test_scaled)
 
-# ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [1])], remainder='passthrough')
-# X = ct.fit_transform(X)
-# ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [6])], remainder='passthrough')
-# X = ct.fit_transform(X)
+# # Calculate the accuracy of the classifier
+# accuracy = accuracy_score(y_test, y_pred)
+# # print("Accuracy:", accuracy)
 
-# sns.histplot(data=X_train, x='pH', bins = 40)
+# # Print classification report
+# # print(classification_report(y_test, y_pred))
 
-# sns.countplot(x = quartile_nitrate_data, hue = y)
-# plt.show()
+# # Create a new data point for prediction
+# new_data = pd.DataFrame({
+#     'Temperature': [25.5],
+#     'Dissolved Oxygen': [7.2],
+#     'pH': [[int(sys.argv[1])]],
+#     'Nitrate (mg/ L)': [2.1]
+# })
 
-# pd.qcut(X_train['Nitrate'],4)
+# # Scale the new data using the same scaler
+# new_data_scaled = scaler.transform(new_data)
 
-from typing import Tuple
-from sklearn.base import BaseEstimator, TransformerMixin
+# # Predict the WQI for the new data point
+# predicted_category = best_rf_classifier.predict(new_data_scaled)[0]
+
+# print("Predicted WQI Category:", predicted_category)
 
 
-def find_boxplot_boundaries(
-    col: pd.Series, whisker_coeff: float = 1.5
-) -> Tuple[float, float]:
-    """Findx minimum and maximum in boxplot.
 
-    Args:
-        col: a pandas serires of input.
-        whisker_coeff: whisker coefficient in box plot
-    """
-    Q1 = col.quantile(0.25)
-    Q3 = col.quantile(0.75)
-    IQR = Q3 - Q1
-    lower = Q1 - whisker_coeff * IQR
-    upper = Q3 + whisker_coeff * IQR
-    return lower, upper
+# import sys
+# import pandas as pd
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import accuracy_score
+# from imblearn.over_sampling import SMOTE
+
+# # Load the data from the CSV file
+# data = pd.read_csv("../data/Results_MADE.csv")
+
+# # Select the relevant columns for classification
+# selected_columns = ['Temperature', 'Dissolved Oxygen', 'pH', 'Nitrate (mg/ L)', 'WQI']
+# df = data[selected_columns].copy()
+
+# # Remove any rows with missing values
+# df.dropna(inplace=True)
+
+# # Convert WQI to categorical labels
+# df['WQI_Category'] = pd.cut(df['WQI'], bins=[0, 25, 50, float('inf')], labels=['Poor', 'Moderate', 'Good'])
+
+# # Separate the features and target variable
+# X = df.drop(['WQI', 'WQI_Category'], axis=1)
+# y = df['WQI_Category']
+
+# # Perform oversampling to balance the classes
+# oversampler = SMOTE(random_state=42)
+# X_resampled, y_resampled = oversampler.fit_resample(X, y)
+
+# # Split the resampled data into training and testing sets
+# X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
+
+# # Create an instance of the Random Forest Classifier and perform hyperparameter tuning
+# rf_classifier = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
+
+# # Fit the classifier to the training data
+# rf_classifier.fit(X_train, y_train)
+
+# # Make predictions on the testing data
+# y_pred = rf_classifier.predict(X_test)
+
+# # Calculate the accuracy of the classifier
+# accuracy = accuracy_score(y_test, y_pred)
+# # print("Accuracy:", accuracy)
+
+# new_data = pd.DataFrame({
+#     'Temperature': [25.5],
+#     'Dissolved Oxygen': [7.2],
+#     'pH': [float(sys.argv[1])],
+#     'Nitrate (mg/ L)': [2.1]
+# })
+
+# # Scale the new data using the same scaler
+# # new_data_scaled = scaler.transform(new_data)
+
+# # Predict the WQI for the new data point
+# predicted_category = rf_classifier.predict(new_data)[0]
+
+# print("Predicted WQI Category:", predicted_category)
 
 
-class BoxplotOutlierClipper(BaseEstimator, TransformerMixin):
-    def __init__(self, whisker_coeff: float = 1.5):
-        self.whisker = whisker_coeff
-        self.lower = None
-        self.upper = None
-
-    def fit(self, X: pd.Series):
-        self.lower, self.upper = find_boxplot_boundaries(X, self.whisker)
-        return self
-
-    def transform(self, X):
-        return X.clip(self.lower, self.upper)
-
-nitrate_after = BoxplotOutlierClipper().fit_transform(X["Nitrate"])
-X['Nitrate'] = nitrate_after
-pH_after = BoxplotOutlierClipper().fit_transform(X["pH"])
-X['pH'] = pH_after
 
 
-#Split dataset to train and test set
-X_train, X_valid, y_train, y_valid = train_test_split(X, y, train_size=0.9, test_size=0.1, random_state=0)
+# import pandas as pd
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.model_selection import train_test_split, GridSearchCV
+# from sklearn.metrics import accuracy_score, classification_report
+# from sklearn.preprocessing import StandardScaler
 
-# fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
-# nitrate_after.hist(bins=50)
-# clipped_total_rooms.to_frame().boxplot(ax=axes[1], vert=False)
+# # Load the dataset
+# df = pd.read_csv("../data/Results_MADE.csv")
 
-# sns.histplot(data=X_train, x='pH', bins = 40)
+# # Keep only the main columns
+# df = df[["pH", "Temperature", "Dissolved Oxygen", "Nitrate (mg/ L)", "WQI"]]
 
-# plt.show()
+# # Remove rows with missing values
+# df = df.dropna()
 
-print(CrossValidationLogReg())
+# # Split the dataset into features (X) and target variable (y)
+# X = df.drop(["WQI"], axis=1)
+# y = df["WQI"]
+
+# # Perform feature scaling
+# scaler = StandardScaler()
+# X_scaled = scaler.fit_transform(X)
+
+# # Split the data into training and testing sets
+# X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# # Perform hyperparameter tuning using GridSearchCV
+# param_grid = {
+#     "n_estimators": [100, 200, 300],
+#     "max_depth": [0, 5, 10],
+#     "min_samples_split": [2, 5, 10],
+#     "min_samples_leaf": [1, 2, 4]
+# }
+
+# grid_search = GridSearchCV(RandomForestClassifier(random_state=42), param_grid, cv=5)
+# grid_search.fit(X_train, y_train)
+
+# # Get the best model from the grid search
+# best_model = grid_search.best_estimator_
+
+# # Predict the water quality classes for the test set
+# y_pred = best_model.predict(X_test)
+
+# # Calculate the accuracy and generate the classification report
+# accuracy = accuracy_score(y_test, y_pred)
+# classification_report = classification_report(y_test, y_pred)
+
+# print("Accuracy:", accuracy)
+# print("Classification Report:\n", classification_report)
+
+
+
+# import pandas as pd
+# from sklearn.model_selection import train_test_split
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.metrics import accuracy_score, classification_report
+# from sklearn.svm import SVC
+
+# # Load the dataset
+# df = pd.read_csv("../data/Results_MADE.csv")
+
+# # Data cleaning and preprocessing
+# # Remove any rows with missing values
+# df = df.dropna()
+# df = df[["pH", "Temperature", "Dissolved Oxygen", "Nitrate (mg/ L)", "WQI"]]
+# print(df)
+
+# # Define the water quality classes based on "WQI" ranges
+# def classify_water_quality(wqi):
+#     if wqi < 50:
+#         return "Poor"
+#     elif 50 <= wqi < 100:
+#         return "Moderate"
+#     elif 100 <= wqi < 150:
+#         return "Good"
+#     else:
+#         return "Excellent"
+
+# # Convert "WQI" column to categorical labels
+# df["Water_Quality_Class"] = df["WQI"].apply(classify_water_quality)
+
+# # Split the dataset into features (X) and target variable (y)
+# X = df.drop(["WQI", "Water_Quality_Class"], axis=1)
+# y = df["Water_Quality_Class"]
+
+# # Split the data into training and testing sets
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# # Train a Random Forest Classifier
+# classifier = SVC()
+# classifier.fit(X_train, y_train)
+
+# # Predict the water quality classes for the test set
+# y_pred = classifier.predict(X_test)
+
+# # Evaluate the model's performance
+# accuracy = accuracy_score(y_test, y_pred)
+# classification_report = classification_report(y_test, y_pred)
+
+# print("Accuracy:", accuracy)
+# print("Classification Report:\n", classification_report)
+
+# import pandas as pd
+# from sklearn.ensemble import RandomForestRegressor
+
+# # Load the dataset
+# df = pd.read_csv("waterqualitydataset.csv")
+
+# df = df[["pH", "Temperature", "Dissolved_Oxygen", "Nitrate (mg/ L)", "WQI"]]
+
+# # Data cleaning and preprocessing
+# # Remove any rows with missing values
+# df = df.dropna()
+
+# print(df)
+
+# # Split the dataset into features (X) and target variable (y)
+# X = df.drop(["WQI"], axis=1)
+# y = df["WQI"]
+
+# # Train a Random Forest Regressor
+# regressor = RandomForestRegressor()
+# regressor.fit(X, y)
+
+# # Example input data for prediction
+# new_data = {
+#     "Temperature": 8.0,
+#     "Dissolved_Oxygen": 9.8,
+#     "pH": 7.6,
+#     "BioChemical_Oxygen_Demand": 0.25,
+#     "Fecal_Streptococci": 125.0,
+#     "Nitrate": 0.2,
+#     "Fecal_Coliform": 30.0,
+#     "Total_Coliform": 250.0,
+#     "Conductivity": 120.0,
+#     "Water_Quality": 0  # This value doesn't matter for prediction
+# }
+
+# # Convert the input data into a DataFrame
+# input_data = pd.DataFrame([new_data])
+
+# # Remove the "Water_Quality" column from the input data
+# input_data = input_data.drop(["Water_Quality"], axis=1)
+
+# # Predict the WQI for the input data
+# predicted_wqi = regressor.predict(input_data)
+
+# print("Predicted WQI:", predicted_wqi)
+
+
+
+
+
+# import pandas as pd
+# from sklearn.model_selection import train_test_split
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.metrics import accuracy_score
+# from sklearn.preprocessing import StandardScaler
+
+# # Load the dataset
+# data = pd.read_csv('../data/waterqualitydataset.csv')
+
+# # Select the desired columns
+# selected_columns = ['pH', 'Temperature', 'Dissolved_Oxygen', 'Nitrate', 'Water_Quality']
+# data = data[selected_columns]
+
+# # Split the data into features (X) and target variable (y)
+# X = data.drop('Water_Quality', axis=1)
+# y = data['Water_Quality']
+
+# # Split the data into training and testing sets
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# # Scale the features
+# scaler = StandardScaler()
+# X_train = scaler.fit_transform(X_train)
+# X_test = scaler.transform(X_test)
+
+# # Train a Random Forest Classifier
+# classifier = RandomForestClassifier(random_state=42)
+# classifier.fit(X_train, y_train)
+
+# # Make predictions on the test set
+# y_pred = classifier.predict(X_test)
+
+# # Calculate the accuracy of the model
+# accuracy = accuracy_score(y_test, y_pred)
+# print("Accuracy:", accuracy)
