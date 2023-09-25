@@ -10,6 +10,7 @@ import { Crop } from "../../Model/crop";
 import ShrimpButton from "./ShrimpButton";
 import socket from "../../utils/socket";
 import { randomData } from "../../utils/common-helper";
+import { OrderStat, StatEffect } from "../../enum/shrimp-stat";
 
 export interface Props {
   statId: string;
@@ -28,6 +29,7 @@ export default function StatComponent({ statId, crop }: Props) {
 
   useEffect(() => {
     socket.emit("get_port_list");
+    socket.emit("FE_TRACKING_BY_CROP", crop?.id);
     socket.on("port_list", (data) => {
       setPorts(data);
     });
@@ -52,19 +54,19 @@ export default function StatComponent({ statId, crop }: Props) {
   //         colorData.shift();
   //       }
   //       var time = moment().format("LT");
-  //       var datapH: number = parseFloat(
+  //       var data: number = parseFloat(
   //         randomData(stat[0].from_stat - 2, stat[0].to_stat + 2, currentStat)
   //       );
-  //       setCurrentStat(datapH);
+  //       setCurrentStat(data);
 
-  //       if (datapH < stat[0].from_stat || datapH > stat[0].to_stat) {
+  //       if (data < stat[0].from_stat || data > stat[0].to_stat) {
   //         colorData.push("#FF0000");
   //       } else {
   //         colorData.push("#1BFF00");
   //       }
   //       setBorderColor(colorData);
 
-  //       chartData.push(datapH);
+  //       chartData.push(data);
   //       setDatas(chartData);
 
   //       timeData.push(time);
@@ -92,18 +94,18 @@ export default function StatComponent({ statId, crop }: Props) {
           colorData.shift();
         }
         var time = moment().format("LT");
-        var datapH: number = data;
-        console.log(data);
-        setCurrentStat(datapH);
+        var dataRecieve: number = data;
+        console.log(dataRecieve);
+        setCurrentStat(dataRecieve);
 
-        if (datapH < stat[0].from_stat || datapH > stat[0].to_stat) {
+        if (dataRecieve < stat[0].from_stat || dataRecieve > stat[0].to_stat) {
           colorData.push("#FF0000");
         } else {
           colorData.push("#1BFF00");
         }
         setBorderColor(colorData);
 
-        chartData.push(datapH);
+        chartData.push(dataRecieve);
         setDatas(chartData);
 
         timeData.push(time);
@@ -116,13 +118,13 @@ export default function StatComponent({ statId, crop }: Props) {
     const min = stat?.length && stat[0]?.from_stat;
     const max = stat?.length && stat[0]?.to_stat;
     let description = "";
-    if (min && max) {
+    if (min && max && stat[0]) {
+      const id: number = +stat[0].id;
+      const type = OrderStat[id] as keyof typeof StatEffect;
       if (currentStat < min) {
-        description +=
-          "Your pH is lower than the normal! Please check your soil or the weather!";
+        description += `Your ${stat[0].name} is lower than the normal! Please check ${StatEffect[type]}!`;
       } else if (currentStat > max) {
-        description +=
-          "Your pH is higher than the normal! Please check your enviroment!";
+        description += `Your ${stat[0].name} is higher than the normal! Please check ${StatEffect[type]}!`;
       }
 
       if (currentStat < min || currentStat > max) {
@@ -144,7 +146,7 @@ export default function StatComponent({ statId, crop }: Props) {
       labels: labels,
       datasets: [
         {
-          label: "pH: ",
+          label: stat && stat.length ? stat[0].name + ": " : "",
           data: datas,
           backgroundColor: borderColor,
           borderColor: "#3e95cd",

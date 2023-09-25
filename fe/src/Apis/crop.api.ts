@@ -10,6 +10,11 @@ export class CropApi {
     return response.data;
   }
 
+  static async getCropById(id: string): Promise<Crop | void> {
+    const response = await apiAxios.get("crop/" + id);
+    return response.data;
+  }
+
   static async getAllTrackingCropsByPondId(
     userName: string,
     statID: number
@@ -17,11 +22,6 @@ export class CropApi {
     const response = await apiAxios.get(
       `crop/tracking/${userName}?statID=${statID}`
     );
-    return response.data;
-  }
-
-  static async getCropById(id: string): Promise<Crop | void> {
-    const response = await apiAxios.get("crop/" + id);
     return response.data;
   }
 
@@ -72,6 +72,16 @@ export class CropApi {
 
   static async getCropHistory(id: string): Promise<History[]> {
     const response = await apiAxios.get("crop/history/all/" + id);
+    return response.data;
+  }
+
+  static async getCropHistoryByStat(
+    id: number,
+    cropID: string
+  ): Promise<History[]> {
+    const response = await apiAxios.get(
+      "crop/history/stat/" + id + "?cropID=" + cropID
+    );
     return response.data;
   }
 

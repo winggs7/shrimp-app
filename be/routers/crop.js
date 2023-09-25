@@ -333,6 +333,30 @@ router.get("/history/:id", async (req, res) => {
   }
 });
 
+//Get history of stat
+router.get("/history/stat/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let cropID = req.query.cropID;
+
+    let sql =
+      "SELECT * FROM DAILY_HISTORY WHERE DAILY_HISTORY.statId = ? AND DAILY_HISTORY.cropID = ?;";
+
+    id &&
+      connection.query(sql, [id, cropID], (err, results) => {
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          results.length > 0
+            ? res.status(200).json(results)
+            : res.status(200).json("Cant find any history!");
+        }
+      });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 //Create/Save history
 router.post("/history", async (req, res) => {
   try {

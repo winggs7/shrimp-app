@@ -34,7 +34,10 @@ export default function AssignStats({ cropId, open, setOpen }: Props) {
       id: cropId,
       statId: value,
       isActive:
-        statIds?.find((s) => s.statId === value)?.isActive === 0 ? 1 : 0,
+        statIds?.length &&
+        statIds?.find((s) => s.statId === value)?.isActive === 0
+          ? 1
+          : 0,
     }).then(() => {
       updateCropStat();
     });

@@ -38,4 +38,16 @@
         background-color: #256D85;
         color: white;
     }
+
+    &.disabled {
+        border: 1px solid #999999;
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+    }
+
+    &.submit {
+        background-color: #256D85;
+        color: white;
+    }
 }

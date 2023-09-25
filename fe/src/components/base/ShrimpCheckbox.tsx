@@ -22,6 +22,7 @@ export default function ShrimpCheckbox({
                 value={item?.id}
                 onChange={(e) => onChange(e)}
                 checked={
+                  checkedItems &&
                   checkedItems?.find((c: any) => c.statId === item.id)
                     ?.isActive === 1
                     ? true

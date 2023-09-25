@@ -12,6 +12,7 @@ import WarningBox from "./WarningBox";
 import { useNavigate } from "react-router-dom";
 import { AlertPopupModel } from "../../Model/alert";
 import AlertPopup from "./AlertPopup";
+import { useWeather } from "../../contexts/weather-context";
 
 export interface Props {
   crop: Crop;
@@ -21,6 +22,8 @@ export interface Props {
 
 export default function CropDetail({ crop, pondId, setCrop }: Props) {
   const navigate = useNavigate();
+
+  const { predictWeather, currentWeather } = useWeather();
 
   const [statIds, setStatIds] = useState<string[]>();
   const [stats, setStats] = useState<Stat[]>();

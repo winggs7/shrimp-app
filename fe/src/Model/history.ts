@@ -1,7 +1,7 @@
 export interface History {
   id: string;
   cropId: string;
-  pondId: string;
+  statId: string;
   history_date: Date;
   num_stat: number;
   isDanger: boolean;

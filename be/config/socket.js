@@ -1,4 +1,4 @@
-const parser = require("./serial");
+// const parser = require("./serial");
 const { SerialPort } = require("serialport");
 
 const socketFunction = (io) => {
@@ -19,19 +19,38 @@ const socketFunction = (io) => {
       });
     });
 
+    client.on("FE_TRACKING_BY_CROP", (crop_id) => {
+      client.broadcast.emit("sIOtype_EVENT", "GET_CROP", crop_id);
+      client.emit("sIOtype_EVENT", "GET_CROP", "crop_id");
+    });
+
+    client.on("START_TRACKING_ARDUINO", (data) => {
+      console.log(data);
+      client.emit("sIOtype_EVENT", "START_SOCKET_FROM_BACKEND", "");
+    });
+
+    client.on("RECEIVE_DATA_FROM_ARDUINO", (data, cropId) => {
+      if (data && cropId) {
+        client.broadcast
+          .to(cropId?.cropId)
+          .emit(`Temp_${cropId?.cropId}`, +data.Temp);
+      }
+    });
+
     client.on("disconnect", (data) => {
+      console.log("Disconnect socket: ");
       console.log(io.sockets.adapter.rooms);
     });
   });
 
-  parser.on("data", function (data) {
-    const temp = data.trim().split(";");
+  // parser.on("data", function (data) {
+  //   const temp = data.trim().split(";");
 
-    const rooms = io.sockets.adapter.rooms;
-    for (const [key, value] of rooms) {
-      io.to(key).emit(`Temp_${key}`, +temp);
-    }
-  });
+  //   const rooms = io.sockets.adapter.rooms;
+  //   for (const [key, value] of rooms) {
+  //     io.to(key).emit(`Temp_${key}`, +temp);
+  //   }
+  // });
 };
 
 module.exports = socketFunction;

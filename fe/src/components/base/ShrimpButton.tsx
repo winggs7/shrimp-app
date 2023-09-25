@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 export interface Props {
   title?: string;
-  type?: "outlined" | "submit" | "cancel" | "error";
+  type?: "outlined" | "submit" | "cancel" | "error" | "disabled";
   onClick?: any;
 }
 

@@ -8,6 +8,7 @@ import provinceData from "./VN_province_position.json";
 import { apiAxios } from "./utils/axios";
 import { CropApi } from "./Apis/crop.api";
 import socket from "./utils/socket";
+import { WeatherProvider } from "./contexts/weather-context";
 
 export const MENU: any = {
   HOME: "HOME",
@@ -57,7 +58,7 @@ export default function App() {
 
     const initTrackingData = async () => {
       if (user) {
-        await CropApi.getAllTrackingCropsByPondId(user?.name, 2).then(
+        await CropApi.getAllTrackingCropsByPondId(user?.name, 1).then(
           (data) => {
             socket.emit(
               "init_tracking",
@@ -87,43 +88,45 @@ export default function App() {
   };
 
   return (
-    <Routes>
-      {user ? (
-        <>
-          <Route
-            path="/"
-            element={
-              <HomeContainer
-                user={user}
-                onSetUser={onSetUser}
-                navigate={MENU.HOME}
-              />
-            }
-          />
-          <Route
-            path="/crop/:pondId"
-            element={
-              <HomeContainer
-                user={user}
-                onSetUser={onSetUser}
-                navigate={MENU.MANAGE}
-              />
-            }
-          />
-          <Route
-            path="/setting"
-            element={
-              <HomeContainer
-                user={user}
-                onSetUser={onSetUser}
-                navigate={MENU.SETTING}
-              />
-            }
-          />
-        </>
-      ) : (
-        <Route path="/*" element={<LoginContainer onSetUser={onSetUser} />} />
-      )}
-    </Routes>
+    <WeatherProvider>
+      <Routes>
+        {user ? (
+          <>
+            <Route
+              path="/"
+              element={
+                <HomeContainer
+                  user={user}
+                  onSetUser={onSetUser}
+                  navigate={MENU.HOME}
+                />
+              }
+            />
+            <Route
+              path="/crop/:pondId"
+              element={
+                <HomeContainer
+                  user={user}
+                  onSetUser={onSetUser}
+                  navigate={MENU.MANAGE}
+                />
+              }
+            />
+            <Route
+              path="/setting"
+              element={
+                <HomeContainer
+                  user={user}
+                  onSetUser={onSetUser}
+                  navigate={MENU.SETTING}
+                />
+              }
+            />
+          </>
+        ) : (
+          <Route path="/*" element={<LoginContainer onSetUser={onSetUser} />} />
+        )}
+      </Routes>
+    </WeatherProvider>
   );
 }

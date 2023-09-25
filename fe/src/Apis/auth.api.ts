@@ -4,17 +4,17 @@ import { apiAxios } from "../utils/axios";
 
 export class AuthApi {
   static async login(email: string, password: string): Promise<User> {
-    const response = await apiAxios.post("/user", { email, password });
+    const response = await apiAxios.post("/auth", { email, password });
     return response.data;
   }
 
   static async register(email: string, password: string): Promise<User> {
-    const response = await apiAxios.post("/user/register", { email, password });
+    const response = await apiAxios.post("/auth/register", { email, password });
     return response.data;
   }
 
   static async refreshToken(refreshToken: string): Promise<string> {
-    const response = await apiAxios.post("/user/refreshToken", {
+    const response = await apiAxios.post("/auth/refreshToken", {
       refreshToken,
     });
     return response.data;

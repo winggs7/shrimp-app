@@ -20,6 +20,10 @@
             width: 80%;
             overflow: hidden;
         }
+        .form__title {
+            display: flex;
+            justify-content: space-between;
+        }
     }
 
     .shrimpForm {

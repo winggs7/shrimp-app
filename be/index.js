@@ -11,13 +11,13 @@ const io = require("socket.io")(http, {
 
 var PORT = +process.env.PORT || 7000;
 
-const parser = require("./config/serial");
 const socketFunction = require("./config/socket");
 const connection = require("./config/dbconnection");
-const userRouter = require("./routers/user");
+const authRouter = require("./routers/auth");
 const pondRouter = require("./routers/pond");
 const cropRouter = require("./routers/crop");
 const statRouter = require("./routers/stat");
+const dataRouter = require("./routers/data");
 
 app.use(express.json());
 app.use(
@@ -34,10 +34,11 @@ connection.connect((err) => {
 
 socketFunction(io);
 
-app.use("/user", userRouter);
+app.use("/auth", authRouter);
 app.use("/pond", pondRouter);
 app.use("/crop", cropRouter);
 app.use("/stat", statRouter);
+app.use("/data", dataRouter);
 
 http.listen(PORT, () => {
   var port = http.address().port;

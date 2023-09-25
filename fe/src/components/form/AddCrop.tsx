@@ -47,7 +47,7 @@ export default function AddCrop({
               CropApi.createStatCrop({
                 id: cropId,
                 lstStats: stats.map((s) => s.id).toString(),
-                lstActive: stats.map((s) => 1).toString(),
+                lstActive: stats.map((s) => 0).toString(),
               });
               socket.emit("create_tracking", cropId);
               setAlertPopup({
