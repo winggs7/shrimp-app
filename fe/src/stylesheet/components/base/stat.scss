@@ -11,6 +11,8 @@
         border-bottom: 1px solid white;
         font-size: 1.125rem;
         font-weight: bold;
+        display: flex;
+        justify-content: space-between;
     }
 
     .stat-chart {

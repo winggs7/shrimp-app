@@ -39,6 +39,7 @@ export default function Manage({ user }: Props) {
       <div className="right-side">
         <InformationBar user={user} />
         <Weather />
+        <Weather isPredict={true} />
       </div>
     </>
   );

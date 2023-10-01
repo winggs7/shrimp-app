@@ -17,6 +17,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   getTemperature();
+  Serial.print("Temp: ");
   Serial.println(tempC);
   delay(1000);
 }

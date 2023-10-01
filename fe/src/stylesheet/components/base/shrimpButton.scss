@@ -49,5 +49,8 @@
     &.submit {
         background-color: #256D85;
         color: white;
+        &:hover {
+            opacity: .6;
+        }
     }
 }

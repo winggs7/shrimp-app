@@ -16,7 +16,7 @@ export const handlePredictWeather = (
 
   times.forEach((time, index) => {
     if (new Date(time).getDate() === currentDate && weatherCode[index] > 60) {
-      if (!isRainyToday) {
+      if (!isRainyToday && new Date(time).getHours() > new Date().getHours()) {
         isRainyToday = true;
         startRainyToday = new Date(time);
       }

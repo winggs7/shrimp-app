@@ -5,6 +5,8 @@ import ShrimpSelect from "../base/ShrimpSelect";
 import { Stat } from "../../Model/stat";
 import { StatApi } from "../../Apis/stat.api";
 import { FORM } from "../../containers/HomeContainer/HomeContainer";
+import AlertPopup from "../base/AlertPopup";
+import { AlertPopupModel } from "../../Model/alert";
 
 export interface Props extends FORM {
   user: any;
@@ -16,6 +18,7 @@ export default function SetStatRange({ user, open, setOpen }: Props) {
   const [id, setId] = useState<number>();
   const [statFrom, setStatFrom] = useState<number>();
   const [statTo, setStatTo] = useState<number>();
+  const [alert, setAlert] = useState<AlertPopupModel | null>();
 
   useEffect(() => {
     StatApi.getAllStats().then((result) => {
@@ -32,9 +35,16 @@ export default function SetStatRange({ user, open, setOpen }: Props) {
         to_stat: statTo,
         userName: user?.name,
       };
-      StatApi.updateStat(data).then(() => {
-        setOpen(false);
-      });
+      StatApi.updateStat(data)
+        .then((data) => {
+          setOpen(false);
+        })
+        .catch((errorMessage) => {
+          setAlert({
+            type: "danger",
+            title: errorMessage,
+          });
+        });
     }
   };
 
@@ -73,6 +83,7 @@ export default function SetStatRange({ user, open, setOpen }: Props) {
           <ShrimpButton title={"cancel"} onClick={() => setOpen(false)} />
         </div>
       </form>
+      {alert && <AlertPopup title={alert.title} type={alert.type} />}
     </div>
   );
 }

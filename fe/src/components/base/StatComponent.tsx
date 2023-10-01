@@ -19,25 +19,24 @@ export interface Props {
 
 export default function StatComponent({ statId, crop }: Props) {
   const [stat, setStat] = useState<Stat[]>();
+  const [statCrop, setStatCrop] = useState<any>();
   const [labels, setLabels] = useState<any[]>([]);
   const [datas, setDatas] = useState<number[]>([]);
   const [borderColor, setBorderColor] = useState<string[]>([]);
   const [currentStat, setCurrentStat] = useState<number>(0.0);
-  const [period, setPeriod] = useState<number>(3000);
-  const [checkPeriod, setCheckPeriod] = useState<number>(3000);
-  const [ports, setPorts] = useState<any>();
+  const [iotId, setIotId] = useState<number>();
 
   useEffect(() => {
     socket.emit("get_port_list");
     socket.emit("FE_TRACKING_BY_CROP", crop?.id);
-    socket.on("port_list", (data) => {
-      setPorts(data);
-    });
   }, []);
 
   useEffect(() => {
     StatApi.getStatById(statId).then((data) => {
       data.length && setStat(data);
+    });
+    CropApi.getStatCrop(crop?.id).then((data) => {
+      setStatCrop(data?.find((d) => d.statId === statId));
     });
   }, [statId]);
 
@@ -81,6 +80,18 @@ export default function StatComponent({ statId, crop }: Props) {
   //   };
   // }, [datas, labels, borderColor, stat, period]);
 
+  const connectIoTDevice = () => {
+    if (iotId) {
+      CropApi.connectIoTDevice({ id: crop.id, statId: +statId, iotId }).then(
+        () => {
+          CropApi.getStatCrop(crop?.id).then((data) => {
+            setStatCrop(data?.find((d) => d.statId === statId));
+          });
+        }
+      );
+    }
+  };
+
   useEffect(() => {
     if (Array.isArray(stat) && stat.length) {
       socket.on(`${stat[0].name}_${crop?.id}`, (data) => {
@@ -112,7 +123,7 @@ export default function StatComponent({ statId, crop }: Props) {
         setLabels(timeData);
       });
     }
-  }, [datas, labels, borderColor, stat, period]);
+  }, [datas, labels, borderColor, stat]);
 
   useEffect(() => {
     const min = stat?.length && stat[0]?.from_stat;
@@ -185,25 +196,22 @@ export default function StatComponent({ statId, crop }: Props) {
       <div className="stat__name">
         {stat?.length && stat[0]?.name}: Current: {datas[datas.length - 1]}
       </div>
-      <span>
-        Using:{" "}
-        {ports?.length && Array.isArray(ports)
-          ? ports[0].path
-          : "Dont connected any serial path"}
-      </span>
-      <br />
-      <br />
-      <div className="periodField">
-        <div className="shrimpInput">
-          <div className="input__title">Period (s):</div>
-          <input
-            type="text"
-            value={checkPeriod / 1000}
-            onChange={(e) => setCheckPeriod(parseInt(e.target.value) * 1000)}
-          />
+      {!statCrop?.iotId ? (
+        <div className="periodField">
+          <div className="shrimpInput">
+            <div className="input__title">Enter iot ID:</div>
+            <input
+              type="number"
+              onChange={(e) => setIotId(parseInt(e.target.value))}
+            />
+          </div>
+          <ShrimpButton title="Accept" onClick={() => connectIoTDevice()} />
         </div>
-        <ShrimpButton title="Accept" onClick={() => setPeriod(checkPeriod)} />
-      </div>
+      ) : (
+        `Connected to IOT ${statCrop.iotId}`
+      )}
+      <br />
+      <br />
       <div className="stat-chart">
         <LineChart data={data} options={options} />
       </div>

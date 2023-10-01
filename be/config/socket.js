@@ -21,7 +21,6 @@ const socketFunction = (io) => {
 
     client.on("FE_TRACKING_BY_CROP", (crop_id) => {
       client.broadcast.emit("sIOtype_EVENT", "GET_CROP", crop_id);
-      client.emit("sIOtype_EVENT", "GET_CROP", "crop_id");
     });
 
     client.on("START_TRACKING_ARDUINO", (data) => {
@@ -30,6 +29,7 @@ const socketFunction = (io) => {
     });
 
     client.on("RECEIVE_DATA_FROM_ARDUINO", (data, cropId) => {
+      console.log(data);
       if (data && cropId) {
         client.broadcast
           .to(cropId?.cropId)
@@ -38,8 +38,7 @@ const socketFunction = (io) => {
     });
 
     client.on("disconnect", (data) => {
-      console.log("Disconnect socket: ");
-      console.log(io.sockets.adapter.rooms);
+      console.log("Disconnect socket!");
     });
   });
 

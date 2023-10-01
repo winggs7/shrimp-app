@@ -1,45 +1,52 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import SMOTE
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score
 
 # Load the dataset
-df = pd.read_csv('../data/waterqualitydataset.csv')
+data = pd.read_csv('../data/Water_Quality.csv')
 
-# Split the dataset into features (X) and target variable (y)
-X = df.drop('Water_Quality', axis=1)
-y = df['Water_Quality']
+# Check for null values
+null_values = data.isnull().sum()
+print("Null Values:")
+print(null_values)
+
+# Fill null values with appropriate data
+# Assuming you want to fill null values with the mean of each column
+data_filled = data.fillna(data.mean())
+
+# Check if null values are filled
+null_values_filled = data_filled.isnull().sum()
+print("Null Values after filling:")
+print(null_values_filled)
+
+# Separate the features and the target variable
+X = data.drop(['Sample ID', 'WQI'], axis=1)
+y = data['WQI']
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Apply feature scaling
+# Scale the features
 scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-# Define the parameter grid for hyperparameter tuning
-param_grid = {
-    'n_estimators': [100, 200, 300],  # Try different number of estimators
-    'max_depth': [None, 5, 10, 15],  # Try different maximum depths
-    'min_samples_split': [2, 5, 10],  # Try different minimum samples for split
-    'min_samples_leaf': [1, 2, 4]  # Try different minimum samples per leaf
-}
+# Apply SMOTE to balance the data
+smote = SMOTE(random_state=42)
+X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
-# Initialize the random forest classifier
-classifier = RandomForestClassifier(random_state=42)
+# Train a classifier
+classifier = SVC()
+classifier.fit(X_train_resampled, y_train_resampled)
 
-# Perform grid search for hyperparameter tuning
-grid_search = GridSearchCV(classifier, param_grid, cv=5)
-grid_search.fit(X_train_scaled, y_train)
+# Predict on the test set
+y_pred = classifier.predict(X_test)
 
-# Get the best classifier after hyperparameter tuning
-best_classifier = grid_search.best_estimator_
-
-# Predict the classes for the testing set
-y_pred = best_classifier.predict(X_test_scaled)
-
-# Evaluate the model's performance
+# Evaluate the classifier
+print(classification_report(y_test, y_pred))
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)

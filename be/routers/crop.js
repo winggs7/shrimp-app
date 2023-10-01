@@ -251,6 +251,28 @@ router.put("/stat/:id", async (req, res) => {
   }
 });
 
+//Update iotDevice to track for a crop
+router.put("/stat/iot/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let statId = req.body.statId;
+    let iotId = req.body.iotId;
+
+    let sql = `UPDATE CROP_STAT SET iotId = ? WHERE cropID = ? AND statID = ?;`;
+
+    id &&
+      connection.query(sql, [iotId, id, statId], (err, results) => {
+        if (err) {
+          res.status(400).json("Cannot update this stat for crop!");
+        } else {
+          res.status(200).json(results);
+        }
+      });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 //delete stat for crop
 router.delete("/stat/:id", async (req, res) => {
   try {
@@ -294,7 +316,7 @@ router.get("/history/all/:id", async (req, res) => {
     let cropID = req.params.id;
 
     let sql =
-      "SELECT * FROM DAILY_HISTORY WHERE DAILY_HISTORY.cropID = ? ORDER BY history_date DESC;";
+      "SELECT * FROM DAILY_HISTORY WHERE DAILY_HISTORY.cropID = ? ORDER BY history_date DESC LIMIT 100;";
 
     cropID &&
       connection.query(sql, cropID, (err, results) => {

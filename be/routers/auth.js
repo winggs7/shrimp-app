@@ -152,24 +152,4 @@ router.post("/refreshToken", (req, res, next) => {
     });
 });
 
-const spawn = require("child_process").spawn;
-
-router.get("/name", (req, res) => {
-  var process = spawn("python", [
-    `${__dirname}/Classification.py`,
-    req.query.pH,
-  ]);
-  let output = "";
-  process.stdout.setEncoding("utf-8");
-  process.stdout.on("data", function (data) {
-    output += data.toString();
-  });
-  process.stderr.on("data", function (data) {
-    output += data.toString();
-  });
-  process.stdout.on("end", () => {
-    res.status(200).json(output.replace("\r\n", ""));
-  });
-});
-
 module.exports = router;

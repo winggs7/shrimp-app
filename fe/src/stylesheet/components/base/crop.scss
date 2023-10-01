@@ -89,3 +89,41 @@
         }
     }
 }
+
+.predict_risk {
+    position: fixed;
+    min-width: 70vw;
+    min-height: fit-content;
+    border: 1px solid #256D85;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 4px;
+    padding: 1rem;
+
+    .threat {
+        color: red;
+    }
+
+    .title {
+        font-size: 1.5rem;
+        color: #256D85;
+        font-weight: bold;
+    }
+
+    ul {
+        padding: 0;
+
+        li {
+            list-style-type: none;
+            padding-left: 1rem;
+        }
+    }
+
+    .shrimp-button {
+        margin: 0;
+        width: 100%;
+        text-align: center;
+    }
+}

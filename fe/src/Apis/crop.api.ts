@@ -101,4 +101,16 @@ export class CropApi {
     const response = await apiAxios.delete("crop/history/" + id);
     return response.data;
   }
+
+  static async connectIoTDevice(payload: {
+    id: string;
+    statId: number;
+    iotId: number;
+  }): Promise<boolean | void> {
+    const response = await apiAxios.put("crop/stat/iot/" + payload.id, {
+      statId: payload.statId,
+      iotId: payload.iotId,
+    });
+    return response.data;
+  }
 }

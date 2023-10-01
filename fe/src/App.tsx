@@ -4,7 +4,6 @@ import "./App.scss";
 import LoginContainer from "./containers/LoginContainer/LoginContainer";
 import { Route, Routes } from "react-router-dom";
 import { User } from "./Model/user";
-import provinceData from "./VN_province_position.json";
 import { apiAxios } from "./utils/axios";
 import { CropApi } from "./Apis/crop.api";
 import socket from "./utils/socket";
@@ -18,26 +17,6 @@ export const MENU: any = {
 
 export default function App() {
   const [user, setUser] = useState<User | undefined>();
-
-  // useEffect(() => {
-  //   navigator.geolocation.getCurrentPosition(async (position) => {
-  //     findProvince(position.coords.latitude, position.coords.longitude);
-  //   });
-  // }, []);
-
-  // const findProvince = (lat: number, long: number): string => {
-  //   let minLat = 999;
-  //   let name = "";
-
-  //   provinceData.forEach((data) => {
-  //     if (Math.abs(data.lat - lat) < Math.abs(minLat - lat)) {
-  //       minLat = data.lat;
-  //       name = data.name;
-  //     }
-  //   });
-  //   console.log(name);
-  //   return name;
-  // };
 
   useEffect(() => {
     if (!user) {

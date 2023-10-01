@@ -43,7 +43,8 @@ export default function Weather({ isPredict }: Props) {
           Rain forecast today: <strong>{isRainy ? "Yes" : "No"}</strong>
         </div>
         <div className="weather">
-          Start raining at: <strong>{date.getHours() + ":00"}</strong>
+          <strong>{isPredict ? "Start " : "Next "}</strong> raining at:{" "}
+          <strong>{date.getHours() + ":00"}</strong>
         </div>
         {!isPredict && (
           <div className="temperature">

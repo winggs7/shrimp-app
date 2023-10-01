@@ -16,19 +16,28 @@ uint16_t serverPort = 7000;
 const char* init_ssid = "Duc Co_2.4G";
 const char* init_password = "nthd29091997";
 
-const String baseURL = "http://192.168.2.7:7000/";
-const String apiSendData = "data?statId=1";
-
-const int delayTime = 3000;
-unsigned long messageTimestamp = 0;
+const char* GET = "GET";
+const char* POST = "POST";
+const char* PUT = "GET";
+const char* DELETE = "DELETE";
 
 //SOCKET: EVENT NAME
 const char* CHANGE_WIFI = "CHANGE_WIFI";
 const char* GET_CROP = "GET_CROP";
 const char* START_SOCKET = "START_SOCKET_FROM_BACKEND";
 
+const String baseURL = "http://192.168.2.7:7000/";
+const String apiSendData = "data?statId=1";
+const String checkIoTConnected = "data/check";
+const String createIoTDevice = "data/create";
+const String getCropByIot = "data/crop";
+
+const int delayTime = 3000;
+unsigned long messageTimestamp = 0;
+
 bool isRunningSocket = false;
 
+int iot_id = 1;
 String crop_id = "";
 
 void setup() {
@@ -44,6 +53,15 @@ void setup() {
   socketIO.onEvent(socketIOEvent);
   delay(200);
   sendDataSocket("START_TRACKING_ARDUINO", { "isConnect" }, { "true" });
+
+  if (callApi(baseURL + checkIoTConnected, POST, "{\"iotId\":\"" + String(iot_id) + "\"}") == "1") {
+    String response = callApi(baseURL + getCropByIot, POST, "{\"iotId\":\"" + String(iot_id) + "\"}");
+    if (response != "") {
+      crop_id = response;
+    }
+  } else {
+    callApi(baseURL + createIoTDevice, POST, "{\"name\":\"" + String(iot_id) + "\"}");
+  }
 }
 
 void loop() {
@@ -58,27 +76,15 @@ void loop() {
       sendDataSocket("START_TRACKING_ARDUINO", { "isConnect" }, { "true" });
     } else {
       if (WiFi.status() == WL_CONNECTED) {
-        String data = Serial.readStringUntil('\n');
+        if (iot_id > 0) {
+          
+          String data = Serial.readStringUntil('\n');
+          data.trim();
 
-        // Remove any leading/trailing whitespace
-        data.trim();
-
-        WiFiClient wifiClient;
-        HTTPClient http;
-        http.begin(wifiClient, (baseURL + apiSendData).c_str());
-        http.addHeader("Content-Type", "application/json");
-
-        if (crop_id != "") {
           if (data.length() > 0) {
-            //Call api
-            int httpResponseCode = http.sendRequest("POST", "{\"statId\":\"1\",\"num_stat\":\"" + data + "\"}");
-            if (httpResponseCode > 0) {
+            String response = callApi(baseURL + apiSendData, POST, "{\"statId\":\"1\",\"num_stat\":\"" + data + "\"}");
+            if (response != "") {
               sendDataSocket("RECEIVE_DATA_FROM_ARDUINO", { "Temp", "cropId" }, { data, crop_id });
-              String response = http.getString();
-              Serial.println("API Response: " + response);
-            } else {
-              Serial.print("Error in sending data to API. Error code: ");
-              Serial.println(httpResponseCode);
             }
           }
         }
@@ -89,6 +95,23 @@ void loop() {
       }
     }
   }
+}
+
+String callApi(String url, const char* method, String data) {
+  String response = "";
+  WiFiClient wifiClient;
+  HTTPClient http;
+  http.begin(wifiClient, (url).c_str());
+  http.addHeader("Content-Type", "application/json");
+  int httpResponseCode = http.sendRequest(method, data);
+  if (httpResponseCode > 0) {
+    response = http.getString();
+    Serial.println("API Response: " + response);
+  } else {
+    Serial.print("Error in sending data to API check IoT connected. Error code: ");
+    Serial.println(httpResponseCode);
+  }
+  return response;
 }
 
 void sendDataSocket(const char* eventName, const std::vector<String>& keys, const std::vector<String>& values) {
@@ -193,7 +216,9 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
         }
 
         if (strcmp(eventArray[1], GET_CROP) == 0) {
-          crop_id = eventArray[2];
+          if (crop_id != "") {
+            crop_id = eventArray[2];
+          }
         }
 
         if (!isRunningSocket) {
