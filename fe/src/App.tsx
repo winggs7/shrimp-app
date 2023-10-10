@@ -19,6 +19,13 @@ export default function App() {
   const [user, setUser] = useState<User | undefined>();
 
   useEffect(() => {
+    socket.emit("START_TRACKING_ARDUINO", 5);
+    socket.on("sIOtype_EVENT", (data) => {
+      console.log(data);
+    });
+  }, []);
+
+  useEffect(() => {
     if (!user) {
       const name = localStorage.getItem("name");
       const access_token = localStorage.getItem("access_token");
