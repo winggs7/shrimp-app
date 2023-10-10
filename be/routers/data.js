@@ -112,8 +112,9 @@ router.post("/crop", async (req, res) => {
 });
 
 router.get("/predict", (req, res) => {
+  console.log(path.resolve("./data/Classification.py"));
   var process = spawn("python", [
-    path.join(__dirname, "..", "data", "Classification.py"),
+    path.resolve("./data/Classification.py"),
     req.query.pH,
     req.query.temp,
     req.query.turbidity,
@@ -123,10 +124,15 @@ router.get("/predict", (req, res) => {
   let output = "";
   process.stdout.setEncoding("utf-8");
   process.stdout.on("data", function (data) {
+    console.log("stdout: " + data);
     output += data.toString();
   });
-  process.stderr.on("data", function (data) {
-    output += data.toString();
+  // process.stderr.on("data", function (data) {
+  //   console.log("stderr: " + data);
+  //   output += data.toString();
+  // });
+  process.on("error", () => {
+    console.log("Fail to start child_process.");
   });
   process.stdout.on("end", () => {
     res.status(200).json(output.replace("\r\n", ""));

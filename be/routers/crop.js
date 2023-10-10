@@ -28,7 +28,7 @@ router.get("/tracking/:userName", async (req, res) => {
     let statID = req.query.statID;
     let sql =
       "SELECT cropId as id FROM CROP_STAT WHERE isActive = TRUE AND statId = ? AND cropId IN (" +
-      "SELECT crop.id FROM CROP JOIN POND ON CROP.pondId = POND.id JOIN USER ON POND.userName = USER.name " +
+      "SELECT CROP.id FROM CROP JOIN POND ON CROP.pondId = POND.id JOIN USER ON POND.userName = USER.name " +
       "WHERE USER.name = ? );";
     connection.query(sql, [statID, name], (err, results) => {
       if (err) {
