@@ -113,7 +113,7 @@ router.post("/crop", async (req, res) => {
 
 router.get("/predict", (req, res) => {
   console.log(path.resolve("./data/Classification.py"));
-  var process = spawn("python", [
+  var process = spawn("python3", [
     path.resolve("./data/Classification.py"),
     req.query.pH,
     req.query.temp,
@@ -136,7 +136,7 @@ router.get("/predict", (req, res) => {
   });
   process.stdout.on("end", () => {
     console.log(output);
-    res.status(200).json(output.replace("\r\n", ""));
+    res.status(200).json(output.replace("\r\n", "").replace("\n", ""));
   });
 });
 
