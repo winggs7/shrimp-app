@@ -1,5 +1,4 @@
 import sys
-import os
 
 import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -8,8 +7,6 @@ from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from joblib import dump, load
-
-this_dir = os.path.dirname(__file__)
 
 columns = ['pH', 'Temperature (°C)', 'Turbidity (NTU)', 'Dissolved Oxygen (mg/L)', 'Conductivity (µS/cm)']
 
@@ -24,7 +21,7 @@ columns = ['pH', 'Temperature (°C)', 'Turbidity (NTU)', 'Dissolved Oxygen (mg/L
 
 def trainModel():
   # Load the dataset
-  data = pd.read_csv(f'{this_dir}/Water_Quality.csv')
+  data = pd.read_csv('./Water_Quality.csv')
 
   # Check for null values
   null_values = data.isnull().sum()
@@ -84,16 +81,8 @@ def trainModel():
   dump(classifier, 'trained_model.joblib')
   return
 
-scaler_data = load(f"{this_dir}/scaler_data.joblib")
-trained_model = load(f"{this_dir}/trained_model.joblib")
-
-# queries = {
-#   'predict_ph': scaler_data.mean_[0],
-#   'predict_temp': scaler_data.mean_[1],
-#   'predict_turbidity': scaler_data.mean_[2],
-#   'predict_do': scaler_data.mean_[3],
-#   'predict_conductivity': scaler_data.mean_[4],
-# }
+scaler_data = load("scaler_data.joblib")
+trained_model = load("trained_model.joblib")
 
 queries = {
   'predict_ph': scaler_data.mean_[0],
