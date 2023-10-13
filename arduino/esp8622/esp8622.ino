@@ -10,11 +10,12 @@
 ESP8266WiFiMulti WiFiMulti;
 SocketIOclient socketIO;
 
-IPAddress serverIP(192, 168, 2, 7);
-uint16_t serverPort = 7000;
+// IPAddress serverIP(139, 99, 57, 31);
+String serverIP = "shrimp-api.winggs.site";
+uint16_t serverPort = 80;
 
-const char* init_ssid = "Duc Co_2.4G";
-const char* init_password = "nthd29091997";
+const char* init_ssid = "WINGgS";
+const char* init_password = "winggs7!";
 
 const char* GET = "GET";
 const char* POST = "POST";
@@ -26,13 +27,13 @@ const char* CHANGE_WIFI = "CHANGE_WIFI";
 const char* GET_CROP = "GET_CROP";
 const char* START_SOCKET = "START_SOCKET_FROM_BACKEND";
 
-const String baseURL = "http://192.168.2.7:7000/";
+const String baseURL = "http://shrimp-api.winggs.site/";
 const String apiSendData = "data?statId=1";
 const String checkIoTConnected = "data/check";
 const String createIoTDevice = "data/create";
 const String getCropByIot = "data/crop";
 
-const int delayTime = 3000;
+const int delayTime = 10000;
 unsigned long messageTimestamp = 0;
 
 bool isRunningSocket = false;
@@ -79,7 +80,9 @@ void loop() {
         if (iot_id > 0) {
           
           String data = Serial.readStringUntil('\n');
+          Serial.println("Before Temp: " + data);
           data.trim();
+          Serial.println("Temp: " + data);
 
           if (data.length() > 0) {
             String response = callApi(baseURL + apiSendData, POST, "{\"statId\":\"1\",\"num_stat\":\"" + data + "\"}");

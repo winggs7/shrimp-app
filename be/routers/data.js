@@ -112,7 +112,6 @@ router.post("/crop", async (req, res) => {
 });
 
 router.get("/predict", (req, res) => {
-  console.log(path.resolve("./data/Classification.py"));
   var process = spawn("python3", [
     path.resolve("./data/Classification.py"),
     req.query.pH,
@@ -135,7 +134,6 @@ router.get("/predict", (req, res) => {
     console.log("Fail to start child_process.");
   });
   process.stdout.on("end", () => {
-    console.log(output);
     res.status(200).json(output.replace("\r\n", "").replace("\n", ""));
   });
 });
