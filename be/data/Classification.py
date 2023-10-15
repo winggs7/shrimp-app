@@ -7,6 +7,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from joblib import dump, load
+import pickle
 
 columns = ['pH', 'Temperature (°C)', 'Turbidity (NTU)', 'Dissolved Oxygen (mg/L)', 'Conductivity (µS/cm)']
 
@@ -49,7 +50,8 @@ def trainModel():
   X_train = scaler.fit_transform(X_train)
   X_test = scaler.transform(X_test)
 
-  dump(scaler, 'scaler_data.joblib')
+  # dump(scaler, 'scaler_data.joblib')
+  pickle.dump(scaler, open('scaler_data.pkl', 'wb'))
 
   # Apply SMOTE to balance the data
   smote = SMOTE(random_state=42)
@@ -78,11 +80,15 @@ def trainModel():
   accuracy = accuracy_score(y_test, y_pred)
   # print("Accuracy on Test Set:", accuracy)
 
-  dump(classifier, 'trained_model.joblib')
-  return
+  # dump(classifier, 'trained_model.joblib')
+  pickle.dump(classifier, open('trained_model.pkl', 'wb'))
 
-scaler_data = load("scaler_data.joblib")
-trained_model = load("trained_model.joblib")
+
+# scaler_data = load("scaler_data.joblib")
+# trained_model = load("trained_model.joblib")
+
+scaler_data = pickle.load(open('scaler_data.pkl', 'rb'))
+trained_model = pickle.load(open('trained_model.pkl', 'rb'))
 
 queries = {
   'predict_ph': scaler_data.mean_[0],
