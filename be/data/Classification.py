@@ -86,6 +86,9 @@ def trainModel():
 scaler_data = load(os.getcwd() + "/data/scaler_data.joblib")
 trained_model = load(os.getcwd() + "/data/trained_model.joblib")
 
+# scaler_data = pickle.load(open('scaler_data.pkl', 'rb'))
+# trained_model = pickle.load(open('trained_model.pkl', 'rb'))
+
 queries = {
   'predict_ph': scaler_data.mean_[0],
   'predict_temp': scaler_data.mean_[1],
