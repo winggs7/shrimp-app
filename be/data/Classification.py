@@ -2,6 +2,7 @@ import os
 import sys
 
 import pandas as pd
+# import sklearn
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
@@ -80,11 +81,11 @@ def trainModel():
   accuracy = accuracy_score(y_test, y_pred)
   # print("Accuracy on Test Set:", accuracy)
 
-  # dump(classifier, 'trained_model.joblib')
+  dump(classifier, 'trained_model.joblib')
 
 
-scaler_data = load(os.getcwd() + "/data/scaler_data.joblib")
-trained_model = load(os.getcwd() + "/data/trained_model.joblib")
+scaler_data = load(os.getcwd() + "/scaler_data.joblib")
+trained_model = load(os.getcwd() + "/trained_model.joblib")
 
 queries = {
   'predict_ph': scaler_data.mean_[0],
@@ -111,3 +112,4 @@ new_data_scaled = scaler_data.transform(new_data)
 predicted_wqi = trained_model.predict(new_data_scaled)
 
 print(predicted_wqi[0])
+# print(print('The scikit-learn version is {}.'.format(sklearn.__version__)))
