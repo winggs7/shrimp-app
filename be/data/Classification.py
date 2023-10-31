@@ -84,8 +84,8 @@ def trainModel():
   dump(classifier, 'trained_model.joblib')
 
 
-scaler_data = load(os.getcwd() + "/scaler_data.joblib")
-trained_model = load(os.getcwd() + "/trained_model.joblib")
+scaler_data = load(os.getcwd() + "/data/scaler_data.joblib")
+trained_model = load(os.getcwd() + "/data/trained_model.joblib")
 
 queries = {
   'predict_ph': scaler_data.mean_[0],
