@@ -126,10 +126,10 @@ router.get("/predict", (req, res) => {
     console.log("stdout: " + data);
     output += data.toString();
   });
-  // process.stderr.on("data", function (data) {
-  //   console.log("stderr: " + data);
-  //   output += data.toString();
-  // });
+  process.stderr.on("data", function (data) {
+    console.log("stderr: " + data);
+    output += data.toString();
+  });
   process.on("error", () => {
     console.log("Fail to start child_process.");
   });

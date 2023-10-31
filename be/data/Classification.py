@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pandas as pd
@@ -50,8 +51,7 @@ def trainModel():
   X_train = scaler.fit_transform(X_train)
   X_test = scaler.transform(X_test)
 
-  # dump(scaler, 'scaler_data.joblib')
-  pickle.dump(scaler, open('scaler_data.pkl', 'wb'))
+  dump(scaler, 'scaler_data.joblib')
 
   # Apply SMOTE to balance the data
   smote = SMOTE(random_state=42)
@@ -81,14 +81,10 @@ def trainModel():
   # print("Accuracy on Test Set:", accuracy)
 
   # dump(classifier, 'trained_model.joblib')
-  pickle.dump(classifier, open('trained_model.pkl', 'wb'))
 
 
-# scaler_data = load("scaler_data.joblib")
-# trained_model = load("trained_model.joblib")
-
-scaler_data = pickle.load(open('scaler_data.pkl', 'rb'))
-trained_model = pickle.load(open('trained_model.pkl', 'rb'))
+scaler_data = load(os.getcwd() + "/data/scaler_data.joblib")
+trained_model = load(os.getcwd() + "/data/trained_model.joblib")
 
 queries = {
   'predict_ph': scaler_data.mean_[0],
