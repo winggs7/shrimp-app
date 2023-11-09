@@ -6,7 +6,7 @@ import { CropApi } from "../../Apis/crop.api";
 import { CreateHistory } from "../../Model/history";
 import { StatApi } from "../../Apis/stat.api";
 import { Stat } from "../../Model/stat";
-import { Crop } from "../../Model/crop";
+import { Crop, CropStat } from "../../Model/crop";
 import ShrimpButton from "./ShrimpButton";
 import socket from "../../utils/socket";
 import { randomData } from "../../utils/common-helper";
@@ -19,17 +19,17 @@ export interface Props {
 
 export default function StatComponent({ statId, crop }: Props) {
   const [stat, setStat] = useState<Stat[]>();
-  const [statCrop, setStatCrop] = useState<any>();
+  const [statCrop, setStatCrop] = useState<CropStat>();
   const [labels, setLabels] = useState<any[]>([]);
   const [datas, setDatas] = useState<number[]>([]);
   const [borderColor, setBorderColor] = useState<string[]>([]);
   const [currentStat, setCurrentStat] = useState<number>(0.0);
   const [iotId, setIotId] = useState<number>();
 
-  useEffect(() => {
-    socket.emit("get_port_list");
-    socket.emit("FE_TRACKING_BY_CROP", crop?.id);
-  }, []);
+  // useEffect(() => {
+  //   socket.emit("get_port_list");
+  //   socket.emit("FE_TRACKING_BY_CROP", crop?.id);
+  // }, []);
 
   useEffect(() => {
     StatApi.getStatById(statId).then((data) => {
@@ -37,6 +37,9 @@ export default function StatComponent({ statId, crop }: Props) {
     });
     CropApi.getStatCrop(crop?.id).then((data) => {
       setStatCrop(data?.find((d) => d.statId === statId));
+      if(statCrop?.iotId) {
+        socket.emit("FE_TRACKING_BY_CROP", crop?.id);
+      }
     });
   }, [statId]);
 
@@ -87,6 +90,7 @@ export default function StatComponent({ statId, crop }: Props) {
           CropApi.getStatCrop(crop?.id).then((data) => {
             setStatCrop(data?.find((d) => d.statId === statId));
           });
+          socket.emit("FE_TRACKING_BY_CROP", crop?.id);
         }
       );
     }
@@ -95,6 +99,7 @@ export default function StatComponent({ statId, crop }: Props) {
   useEffect(() => {
     if (Array.isArray(stat) && stat.length) {
       socket.on(`${stat[0].name}_${crop?.id}`, (data) => {
+        console.log(data)
         const chartData: number[] = [...datas];
         const timeData: any[] = [...labels];
         const colorData: string[] = [...borderColor];

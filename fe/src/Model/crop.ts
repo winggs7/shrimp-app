@@ -20,4 +20,5 @@ export interface CropStat {
   cropId: string;
   statId: string;
   isActive: number;
+  iotId?: any;
 }
