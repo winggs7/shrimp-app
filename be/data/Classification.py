@@ -61,12 +61,12 @@ def trainModel():
   # Train a Random Forest classifier
   classifier = RandomForestClassifier()
   classifier.fit(X_train_resampled, y_train_resampled)
+  # Evaluate the classifier using cross-validation
+  cv_scores = cross_val_score(classifier, X_train_resampled, y_train_resampled, cv=10)
 
   # Predict on the test set
   y_pred = classifier.predict(X_test)
 
-  # Evaluate the classifier using cross-validation
-  cv_scores = cross_val_score(classifier, X_train_resampled, y_train_resampled, cv=10)
 
   # Evaluate the classifier
   # print(classification_report(y_test, y_pred))

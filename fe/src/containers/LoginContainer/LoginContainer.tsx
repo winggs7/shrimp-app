@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { AuthApi } from "../../Apis/auth.api";
 import AlertPopup from "../../components/base/AlertPopup";
 import { AlertPopupModel } from "../../Model/alert";
+import { useNavigate } from "react-router-dom";
 
 export interface Props {
   onSetUser: any;
 }
 
 export default function LoginContainer({ onSetUser }: Props) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLogin, setIsLogin] = useState<boolean>(true);
@@ -18,6 +20,7 @@ export default function LoginContainer({ onSetUser }: Props) {
     await AuthApi.login(email, password)
       .then((data) => {
         onSetUser(data);
+        navigate(`/`)
       })
       .catch((errorMessage) => {
         setAlert({

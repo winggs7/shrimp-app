@@ -78,15 +78,16 @@ void loop() {
     } else {
       if (WiFi.status() == WL_CONNECTED) {
         if (iot_id > 0) {
-          
           String data = Serial.readStringUntil('\n');
+
           Serial.println("Before Temp: " + data);
           data.trim();
           Serial.println("Temp: " + data);
 
           if (data.length() > 0) {
             String response = callApi(baseURL + apiSendData, POST, "{\"statId\":\"1\",\"num_stat\":\"" + data + "\"}");
-            if (response != "") {
+            if (response != "" && crop_id != "") {
+              Serial.println("CropId: " + crop_id);
               sendDataSocket("RECEIVE_DATA_FROM_ARDUINO", { "Temp", "cropId" }, { data, crop_id });
             }
           }
