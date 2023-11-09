@@ -258,17 +258,28 @@ router.put("/stat/iot/:id", async (req, res) => {
     let statId = req.body.statId;
     let iotId = req.body.iotId;
 
-    let sql = `UPDATE CROP_STAT SET iotId = ? WHERE cropID = ? AND statID = ?
-    AND NOT EXISTS (SELECT * FROM CROP_STAT WHERE CROP_STAT.iotId = ?);`;
+    let checksql = "SELECT * FROM CROP_STAT WHERE CROP_STAT.iotId = ?;";
 
-    id &&
-      connection.query(sql, [iotId, id, statId, iotId], (err, results) => {
-        if (err) {
-          res.status(400).json("Cannot update this stat for crop!");
-        } else {
-          res.status(200).json(results);
+    iotId && connection.query(checksql, [iotId], (err, results) => {
+      if (err) {
+        res.status(401).json("Cannot update this stat for crop!");
+      } else {
+        if(!results.length) {
+          let sql = `UPDATE CROP_STAT SET iotId = ? WHERE cropID = ? AND statID = ?;`;
+
+          id &&
+            connection.query(sql, [iotId, id, statId, iotId], (err, results) => {
+              if (err) {
+                res.status(400).json("Cannot update this stat for crop!");
+              } else {
+                res.status(200).json(results);
+              }
+            });
         }
-      });
+      }
+    });
+
+
   } catch (error) {
     res.status(500).json(error);
   }
